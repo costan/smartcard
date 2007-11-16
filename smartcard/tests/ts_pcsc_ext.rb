@@ -120,11 +120,15 @@ select_response = card0.transmit(select_apdu.map {|byte| byte.chr}.join(''), sen
 select_response_str = (0...select_response.length).map { |i| ' %02x' % select_response[i].to_i }.join('')
 puts "Response:#{select_response_str}\n"
 
-# This only works with GemPlus readers... any other suggestions?
-puts "Testing low-level control\n"
-ctl_string = [0x82, 0x01, 0x07, 0x00].map {|byte| byte.chr}.join('')
-ctl_response = card0.control 2049, ctl_string, 4
-pp ctl_response
+begin
+  # This only works with GemPlus readers... any other suggestions?
+  puts "Testing low-level control\n"
+  ctl_string = [0x82, 0x01, 0x07, 0x00].map {|byte| byte.chr}.join('')
+  ctl_response = card0.control 2049, ctl_string, 4
+  pp ctl_response
+rescue RuntimeError => e
+  puts "Card.control threw exception #{e}\n"
+end
 
 puts "Disconnecting and cleaning up\n"
 card0.disconnect Smartcard::PCSC::DISPOSITION_LEAVE

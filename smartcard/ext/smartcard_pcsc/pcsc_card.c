@@ -263,7 +263,13 @@ static VALUE PCSC_Card_transmit(VALUE self, VALUE rbSendData, VALUE rbSendIoRequ
 		return Qnil;	
 	}
 	
-	DWORD recv_length = PCSCLITE_MAX_MESSAGE_SIZE; 
+#if defined(PCSCLITE_MAX_MESSAGE_SIZE)
+	DWORD recv_length = PCSCLITE_MAX_MESSAGE_SIZE;
+#elif defined(MAX_BUFFER_SIZE_EXTENDED)
+	DWORD recv_length = MAX_BUFFER_SIZE_EXTENDED;
+#else
+	DWORD recv_length = 65536;
+#endif
 	char *recv_buffer = ALLOC_N(char, recv_length);
 	if(recv_buffer == NULL) return Qnil;
 	

@@ -1,1 +1,1 @@
-require 'smartcard_pcsc'
+require 'smartcard/pcsc'

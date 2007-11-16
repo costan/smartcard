@@ -1,6 +1,6 @@
 #include "pcsc.h"
 
-void Init_smartcard_pcsc() {
+void Init_pcsc() {
 	Init_PCSC_Namespace();
 	Init_PCSC_ReaderStates();
 	Init_PCSC_IoRequest();
