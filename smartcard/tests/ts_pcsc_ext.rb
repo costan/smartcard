@@ -1,4 +1,5 @@
 require 'smartcard'
+require 'pp'
 
 def test_reader_states
   reader_states = Smartcard::PCSC::ReaderStates.new(2)
