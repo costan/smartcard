@@ -2,7 +2,7 @@ require 'rubygems'
 
 spec = Gem::Specification.new do |s| 
 	s.name = "smartcard" 
-	s.version = "0.1.0" 
+	s.version = "0.1.1" 
 	s.author = "Victor Costan" 
 	s.email = "victor@costan.us" 
 	s.homepage = "http://www.costan.us/smartcard" 
@@ -21,6 +21,6 @@ spec = Gem::Specification.new do |s|
 end 
 
 if $0 == __FILE__ 
-Gem::manage_gems 
-Gem::Builder.new(spec).build 
-end 
+  Gem::manage_gems 
+  Gem::Builder.new(spec).build 
+end
