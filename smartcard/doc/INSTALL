@@ -1,0 +1,64 @@
+In a perfect world, installing 'smartcard' would be an easy 'gem install smartcard'.
+However, interfacing with hardware is never that easy. 
+
+Building the extension on a POSIX system
+------------
+You need to be able to build C code, and have the pcsclite library installed. 
+Then follow the standard Ruby extension build process:
+1. cd <smartcard_dir>\ext\smartcard_pcsc
+2. ruby extconf.rb
+3. make
+4. make install
+
+OSX
+---
+Install the Developer Tools.
+
+Leopard: everything else is already in place.
+Tiger: need someone to test whether the pcsclite library included here works.
+
+Ubuntu
+---
+Install the following packages:
+	buildessentials
+	libccid
+	libpcsclite
+	libpcsclite-dev
+You might want to install the following packages to check for your reader's PC/SC compatibility.
+	pcscd
+	pcsc-tools
+	
+Something else
+---
+Go to the MUSCLE page: http://www.linuxnet.com/software.html
+You need to download the pcsclite middleware and a driver for your reader.
+The ccid driver works with most readers out there (this software is tested on it).
+
+
+Building the extension on Windows
+------------
+
+This is a reference stolen from a random website and adapted for this extension.
+It reminds the developers how to build the Ruby extension. Most people should use
+the pre-compiled gem. 
+
+1. Download and install Visual C++ 2005 Express Edition (free) 
+2. Download and install the Platform SDK (ISO Edition) from Microsoft. 
+	(I installed none of the 64–bit stuff — mostly just the 32–bit Intel core SDK)
+3. Edit $RUBY_HOME/lib/ruby/1.8/i386-mswin32/config.h and delete the “#error MSC version unmatch” line 
+4. Click your way to: 
+	Start
+	All Programs
+	Microsoft Platform SDK…
+	Open Build Environment Window
+	Windows XP 32–bit Build Environment
+	Set Windows XP…(Retail) 
+5. cd "C:\Program Files\Microsoft Visual Studio 8\VC\bin" 
+	The quotes are important. 
+6. vcvars32.bat 
+7. cd <smartcard_dir>\ext\smartcard_pcsc 
+8. ruby extconf.rb
+9. nmake
+10.	mt.exe -manifest pcsc.so.manifest -outputresource:pcsc.so;2 
+	Copy and paste the command above. You need it all from the 'mt' to the ';2' 
+11. nmake install
