@@ -40,6 +40,7 @@ static VALUE PCSC_Context_alloc(VALUE klass) {
  */
 static VALUE PCSC_Context_initialize(VALUE self, VALUE scope) {
 	struct SCardContextEx *context;	
+	
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	
 	context->pcsc_error = SCardEstablishContext(NUM2INT(scope), NULL, NULL, &context->pcsc_context);
@@ -60,6 +61,7 @@ static VALUE PCSC_Context_initialize(VALUE self, VALUE scope) {
  */
 static VALUE PCSC_Context_release(VALUE self) {
 	struct SCardContextEx *context;	
+	
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	if(context == NULL) return self;
 
@@ -87,8 +89,8 @@ static VALUE PCSC_Context_is_valid(VALUE self) {
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	if(context == NULL) return self;
 
-	DWORD pcsc_error = SCardIsValidContext(context->pcsc_context);		
-	return (pcsc_error == SCARD_S_SUCCESS) ? Qtrue : Qfalse;
+	context->pcsc_error = SCardIsValidContext(context->pcsc_context);		
+	return (context->pcsc_error == SCARD_S_SUCCESS) ? Qtrue : Qfalse;
 }
 
 /* :Document-method: list_reader_groups
@@ -101,18 +103,21 @@ static VALUE PCSC_Context_is_valid(VALUE self) {
  * Returns an array of strings containing the names of all the smart-card readers in the system.
  */
 static VALUE PCSC_Context_list_reader_groups(VALUE self) {
-	struct SCardContextEx *context;	
+	struct SCardContextEx *context;
+	VALUE rbGroups;
+	char *groups;
+	DWORD groups_length;
+	
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	if(context == NULL) return Qnil;
 		
-	DWORD groups_length;
 	context->pcsc_error = SCardListReaderGroups(context->pcsc_context, NULL, &groups_length);
 	if(context->pcsc_error == SCARD_S_SUCCESS) {
-		char *groups = ALLOC_N(char, groups_length);
+		groups = ALLOC_N(char, groups_length);
 		if(groups != NULL) {
 			context->pcsc_error = SCardListReaderGroups(context->pcsc_context, groups, &groups_length);
 			if(context->pcsc_error == SCARD_S_SUCCESS) {
-				VALUE rbGroups = PCSC_Internal_multistring_to_ruby_array(groups, groups_length);
+				rbGroups = PCSC_Internal_multistring_to_ruby_array(groups, groups_length);
 				xfree(groups);
 				return rbGroups;
 			}
@@ -137,24 +142,26 @@ static VALUE PCSC_Context_list_reader_groups(VALUE self) {
  * +reader_groups+:: array of strings indicating the reader groups to list; also accepts a string or +nil+ (meaning all readers)
  */
 static VALUE PCSC_Context_list_readers(VALUE self, VALUE rbGroups) {
-	struct SCardContextEx *context;	
+	struct SCardContextEx *context;
+	VALUE rbReaders;
+	char *groups;
+	DWORD readers_length;
+	
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	if(context == NULL) return Qnil;
 
-	char *groups;
 	if(PCSC_Internal_ruby_strings_to_multistring(rbGroups, &groups) == 0) {
 		rb_raise(rb_eArgError, "invalid reader groups set (expecting nil or string or array of strings)");
 		return Qnil;
 	}
 	
-	DWORD readers_length;
 	context->pcsc_error = SCardListReaders(context->pcsc_context, groups, NULL, &readers_length);
 	if(context->pcsc_error == SCARD_S_SUCCESS) {
 		char *readers = ALLOC_N(char, readers_length);
 		if(readers != NULL) {
 			context->pcsc_error = SCardListReaders(context->pcsc_context, groups, readers, &readers_length);
 			if(context->pcsc_error == SCARD_S_SUCCESS) {
-				VALUE rbReaders = PCSC_Internal_multistring_to_ruby_array(readers, readers_length);
+				rbReaders = PCSC_Internal_multistring_to_ruby_array(readers, readers_length);
 				xfree(readers);
 				if(groups != NULL) xfree(groups);
 				return rbReaders;
@@ -177,7 +184,8 @@ static VALUE PCSC_Context_list_readers(VALUE self, VALUE rbGroups) {
  * Wraps _SCardCancel_ in PC/SC.
  */
 static VALUE PCSC_Context_cancel(VALUE self) {
-	struct SCardContextEx *context;	
+	struct SCardContextEx *context;
+	
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	if(context == NULL) return self;
 	
@@ -202,18 +210,19 @@ static VALUE PCSC_Context_cancel(VALUE self) {
  * ReaderStates#set_event_state_of and ReaderStates#event_state_of)
  */
 static VALUE PCSC_Context_get_status_change(VALUE self, VALUE rbReaderStates, VALUE rbTimeout) {
-	struct SCardContextEx *context;	
+	struct SCardContextEx *context;
+	SCARD_READERSTATE *reader_states;
+	size_t reader_states_count;	
+	DWORD timeout;
+	
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	if(context == NULL) return self;
 	
-	unsigned int timeout;
 	if(TYPE(rbTimeout) == T_NIL || TYPE(rbTimeout) == T_FALSE)
 		timeout = INFINITE;
 	else
 		timeout = NUM2INT(rbTimeout);
 	
-	SCARD_READERSTATE *reader_states;
-	size_t reader_states_count;	
 	if(_PCSC_ReaderStates_lowlevel_get(rbReaderStates, &reader_states, &reader_states_count) == 0)
 		rb_raise(rb_eArgError, "first parameter is not a ReaderStates instance or nil");
 	else {
@@ -235,6 +244,7 @@ static VALUE PCSC_Context_get_status_change(VALUE self, VALUE rbReaderStates, VA
  */
 static VALUE PCSC_Context_last_error(VALUE self) {
 	struct SCardContextEx *context;	
+	
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	if(context == NULL) return Qnil;
 
@@ -265,10 +275,11 @@ void Init_PCSC_Context() {
 
 /* Retrieves the SCARDCONTEXT wrapped into a Smartcard::PCSC::Context instance. */
 int _PCSC_Context_lowlevel_get(VALUE rbContext, SCARDCONTEXT *pcsc_context) {
+	struct SCardContextEx *context;	
+
 	if(TYPE(rbContext) != T_DATA || RDATA(rbContext)->dfree != (void (*)(void *))PCSC_Context_free)
 		return 0;	
 	
-	struct SCardContextEx *context;	
 	Data_Get_Struct(rbContext, struct SCardContextEx, context);
 	*pcsc_context = context->pcsc_context;
 	return 1;

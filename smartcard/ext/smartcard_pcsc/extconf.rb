@@ -1,5 +1,4 @@
 require 'mkmf'
-require 'pp'
 
 $CFLAGS ||= ''
 $LDFLAGS ||= ''
@@ -7,7 +6,7 @@ $LDFLAGS ||= ''
 if RUBY_PLATFORM =~ /darwin/
   $LDFLAGS += ' -framework PCSC'
 elsif RUBY_PLATFORM =~ /win/
-  # TODO: no clue what to do here
+  have_library('winscard')
 else
   # pcsc is retarded and uses stuff like '#include <wintypes.h>'
   $CFLAGS += ' -I /usr/include/PCSC -I /usr/local/include/pcsc'

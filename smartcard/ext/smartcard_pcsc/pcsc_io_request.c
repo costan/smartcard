@@ -26,6 +26,7 @@ static VALUE PCSC_IoRequest_alloc(VALUE klass) {
  */
 static VALUE PCSC_IoRequest_get_protocol(VALUE self) {
 	SCARD_IO_REQUEST *request;
+	
 	Data_Get_Struct(self, SCARD_IO_REQUEST, request);
 	if(request == NULL) return Qnil;
 	
@@ -42,6 +43,7 @@ static VALUE PCSC_IoRequest_get_protocol(VALUE self) {
  */
 static VALUE PCSC_IoRequest_set_protocol(VALUE self, VALUE rbProtocol) {
 	SCARD_IO_REQUEST *request;
+	
 	Data_Get_Struct(self, SCARD_IO_REQUEST, request);
 	if(request == NULL) return self;
 	
@@ -70,6 +72,8 @@ void Init_PCSC_IoRequest() {
 
 /* Retrieves the SCARD_IO_REQUEST wrapped into a Smartcard::PCSC::IoRequest instance. */
 int _PCSC_IoRequest_lowlevel_get(VALUE rbIoRequest, SCARD_IO_REQUEST **io_request) {
+	SCARD_IO_REQUEST *request;	
+
 	if(TYPE(rbIoRequest) == T_NIL || TYPE(rbIoRequest) == T_FALSE) {
 		*io_request = NULL;
 		return 1;
@@ -77,7 +81,6 @@ int _PCSC_IoRequest_lowlevel_get(VALUE rbIoRequest, SCARD_IO_REQUEST **io_reques
 	if(TYPE(rbIoRequest) != T_DATA || RDATA(rbIoRequest)->dfree != (void (*)(void *))PCSC_IoRequest_free)
 		return 0;
 	
-	SCARD_IO_REQUEST *request;	
 	Data_Get_Struct(rbIoRequest, SCARD_IO_REQUEST, request);
 	*io_request = request;
 	return 1;

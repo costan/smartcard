@@ -3,14 +3,16 @@
 
 /* Converts a multi-string "str1\0str_2\0str3\0\0" into a Ruby array of Ruby strings. */
 VALUE PCSC_Internal_multistring_to_ruby_array(char *mstr, size_t mstr_len) {
-	VALUE rbArray = rb_ary_new();
-	int i = 0;
-	for(; i < mstr_len; i++) {
+	VALUE rbArray, rbString;
+	size_t i, start_offset;
+	
+	rbArray = rb_ary_new();
+	for(i = 0; i < mstr_len; i++) {
 		if(mstr[i] == '\0') break;
-		int start_offset = i;
+		start_offset = i;
 		for(; i < mstr_len; i++)
 			if(mstr[i] == '\0') break;
-		VALUE rbString = rb_str_new(mstr + start_offset, i - start_offset);
+		rbString = rb_str_new(mstr + start_offset, i - start_offset);
 		rb_ary_push(rbArray, rbString);
 	}
 	return rbArray;
@@ -21,6 +23,10 @@ VALUE PCSC_Internal_multistring_to_ruby_array(char *mstr, size_t mstr_len) {
  * If false is returned, something went wrong and the method did not return a buffer. 
  */
 int PCSC_Internal_ruby_strings_to_multistring(VALUE rbStrings, char **strings) {
+	VALUE *array_elements;
+	char *buffer;
+	size_t string_length, array_length, buffer_length, i;
+	
 	/* nil -> NULL */ 
 	if(TYPE(rbStrings) == T_NIL || TYPE(rbStrings) == T_FALSE) {
 		*strings = NULL;
@@ -28,8 +34,8 @@ int PCSC_Internal_ruby_strings_to_multistring(VALUE rbStrings, char **strings) {
 	}
 	/* string -> [string] */
 	if(TYPE(rbStrings) == T_STRING) {
-		size_t string_length = RSTRING(rbStrings)->len; 
-		char *buffer = ALLOC_N(char, string_length + 2);
+		string_length = RSTRING(rbStrings)->len; 
+		buffer = ALLOC_N(char, string_length + 2);
 		memcpy(buffer, RSTRING(rbStrings)->ptr, string_length);
 		buffer[string_length] = buffer[string_length + 1] = '\0';
 		*strings = buffer;
@@ -38,20 +44,19 @@ int PCSC_Internal_ruby_strings_to_multistring(VALUE rbStrings, char **strings) {
 	/* array -> array */
 	if(TYPE(rbStrings) == T_ARRAY) {
 		/* compute buffer length */
-		size_t array_length = RARRAY(rbStrings)->len;
-		VALUE *array_elements = RARRAY(rbStrings)->ptr;
-		size_t buffer_length = 1; /* for the trailing '\0' */
-		int i = 0;
-		for(; i < array_length; i++) {
+		array_length = RARRAY(rbStrings)->len;
+		array_elements = RARRAY(rbStrings)->ptr;
+		buffer_length = 1; /* for the trailing '\0' */
+		for(i = 0; i < array_length; i++) {
 			if(TYPE(array_elements[i]) != T_STRING)
 				return 0;
 			buffer_length += RSTRING(array_elements[i])->len + 1; 
 		}
 		
 		/* concatenate strings into buffer */
-		char *buffer = ALLOC_N(char, buffer_length);
+		buffer = ALLOC_N(char, buffer_length);
 		for(buffer_length = 0, i = 0; i < array_length; i++) {
-			size_t string_length = RSTRING(array_elements[i])->len;
+			string_length = RSTRING(array_elements[i])->len;
 			memcpy(buffer + buffer_length, RSTRING(array_elements[i])->ptr, string_length);
 			buffer[buffer_length] = '\0';
 			buffer_length += string_length + 1;
@@ -63,3 +68,15 @@ int PCSC_Internal_ruby_strings_to_multistring(VALUE rbStrings, char **strings) {
 	
 	return 0;
 }
+
+#if defined(WIN32)
+char scard_error_buffer[128];
+
+/* Produces a string for an error code yielded by the SCard* PC/SC functions. Returns a static global buffer. */
+char *pcsc_stringify_error(DWORD scard_error) {
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, scard_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        scard_error_buffer, sizeof(scard_error_buffer), NULL );
+	return scard_error_buffer;
+}
+#endif

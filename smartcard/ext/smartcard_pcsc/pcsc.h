@@ -36,3 +36,11 @@ void Init_PCSC_Consts();
 /* Multi-string (win32 abomination) tools. */
 VALUE PCSC_Internal_multistring_to_ruby_array(char *mstr, size_t mstr_len);
 int PCSC_Internal_ruby_strings_to_multistring(VALUE rbStrings, char **strings);
+
+/* Messing up with constants that aren't uniformly defined. */
+#if !defined(MAX_ATR_SIZE)
+#define MAX_ATR_SIZE 32
+#endif
+#if !defined(SCARD_PROTOCOL_ANY)
+#define SCARD_PROTOCOL_ANY (SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1)
+#endif

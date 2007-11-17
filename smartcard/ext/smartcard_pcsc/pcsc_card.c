@@ -43,24 +43,26 @@ static VALUE PCSC_Card_alloc(VALUE klass) {
  */
 static VALUE PCSC_Card_initialize(VALUE self, VALUE rbContext, VALUE rbReaderName, VALUE rbShareMode, VALUE rbPreferredProtocols) {
 	struct SCardHandleEx *card;
+	SCARDCONTEXT context;
+	VALUE rbFinalReaderName;
+	DWORD share_mode, preferred_protocols, active_protocol;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	
-	SCARDCONTEXT context;
 	if(_PCSC_Context_lowlevel_get(rbContext, &context) == 0) {
 		rb_raise(rb_eArgError, "first argument is not a Context instance");
 		return self;
 	}
 	
-	VALUE rbFinalReaderName = rb_check_string_type(rbReaderName);
+	rbFinalReaderName = rb_check_string_type(rbReaderName);
 	if(NIL_P(rbFinalReaderName)) {
 		rb_raise(rb_eArgError, "second argument (should be reader name) does not convert to a String");
 		return self;
 	}
 	
-	DWORD share_mode = NUM2UINT(rbShareMode);
-	DWORD preferred_protocols = NUM2UINT(rbPreferredProtocols);
+	share_mode = NUM2UINT(rbShareMode);
+	preferred_protocols = NUM2UINT(rbPreferredProtocols);
 	
-	DWORD active_protocol;
 	card->pcsc_error = SCardConnect(context, RSTRING(rbFinalReaderName)->ptr, share_mode, preferred_protocols, &card->card_handle, &active_protocol);	
 	if(card->pcsc_error != SCARD_S_SUCCESS)
 		rb_raise(rb_eRuntimeError, "SCardConnect: %s", pcsc_stringify_error(card->pcsc_error));
@@ -82,14 +84,15 @@ static VALUE PCSC_Card_initialize(VALUE self, VALUE rbContext, VALUE rbReaderNam
  */
 static VALUE PCSC_Card_reconnect(VALUE self, VALUE rbShareMode, VALUE rbPreferredProtocols, VALUE rbInitialization) {
 	struct SCardHandleEx *card;
+	DWORD share_mode, preferred_protocols, initialization, active_protocol;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return self;
 
-	DWORD share_mode = NUM2UINT(rbShareMode);
-	DWORD preferred_protocols = NUM2UINT(rbPreferredProtocols);
-	DWORD initialization = NUM2UINT(rbInitialization);
+	share_mode = NUM2UINT(rbShareMode);
+	preferred_protocols = NUM2UINT(rbPreferredProtocols);
+	initialization = NUM2UINT(rbInitialization);
 	
-	uint32_t active_protocol;
 	card->pcsc_error = SCardReconnect(card->card_handle, share_mode, preferred_protocols, initialization, &active_protocol);
 	if(card->pcsc_error != SCARD_S_SUCCESS)
 		rb_raise(rb_eRuntimeError, "SCardReconnect: %s", pcsc_stringify_error(card->pcsc_error));
@@ -107,11 +110,13 @@ static VALUE PCSC_Card_reconnect(VALUE self, VALUE rbShareMode, VALUE rbPreferre
  * +disposition+:: action to be taken on the card inside the reader; use one of the Smartcard::PCSC::DISPOSITION_ constants
  */
 static VALUE PCSC_Card_disconnect(VALUE self, VALUE rbDisposition) {
-	struct SCardHandleEx *card;	
+	struct SCardHandleEx *card;
+	DWORD disposition;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return self;
 
-	DWORD disposition = NUM2UINT(rbDisposition);
+	disposition = NUM2UINT(rbDisposition);
 	if(!card->released) {
 		card->pcsc_error = SCardDisconnect(card->card_handle, disposition);		
 		card->released = 1;
@@ -129,7 +134,8 @@ static VALUE PCSC_Card_disconnect(VALUE self, VALUE rbDisposition) {
  * Wraps _SCardBeginTransaction_ in PC/SC.
  */
 static VALUE PCSC_Card_begin_transaction(VALUE self) {
-	struct SCardHandleEx *card;	
+	struct SCardHandleEx *card;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return self;
 	
@@ -149,11 +155,13 @@ static VALUE PCSC_Card_begin_transaction(VALUE self) {
  * +disposition+:: action to be taken on the card inside the reader; use one of the Smartcard::PCSC::DISPOSITION_ constants
  */
 static VALUE PCSC_Card_end_transaction(VALUE self, VALUE rbDisposition) {
-	struct SCardHandleEx *card;	
+	struct SCardHandleEx *card;
+	DWORD disposition;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return self;
 	
-	DWORD disposition = NUM2UINT(rbDisposition);
+	disposition = NUM2UINT(rbDisposition);
 	card->pcsc_error = SCardEndTransaction(card->card_handle, disposition);
 	if(card->pcsc_error != SCARD_S_SUCCESS)
 		rb_raise(rb_eRuntimeError, "SCardEndTransaction: %s", pcsc_stringify_error(card->pcsc_error));	
@@ -174,19 +182,23 @@ static VALUE PCSC_Card_end_transaction(VALUE self, VALUE rbDisposition) {
  * +attribute_id+:: identifies the attribute to be read; use one of the Smartcard::PCSC::ATTR_ constants
  */
 static VALUE PCSC_Card_get_attribute(VALUE self, VALUE rbAttributeId) {
-	struct SCardHandleEx *card;	
+	struct SCardHandleEx *card;
+	char *attribute_buffer;
+	DWORD attribute_id, attribute_length;
+	VALUE rbAttribute;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return Qnil;
 	
-	DWORD attribute_id = NUM2UINT(rbAttributeId);
-	DWORD attribute_length;
+	attribute_id = NUM2UINT(rbAttributeId);
+	attribute_length;
 	card->pcsc_error = SCardGetAttrib(card->card_handle, attribute_id, NULL, &attribute_length);
 	if(card->pcsc_error == SCARD_S_SUCCESS) {
-		char *attribute_buffer = ALLOC_N(char, attribute_length);
+		attribute_buffer = ALLOC_N(char, attribute_length);
 		if(attribute_buffer != NULL) {
 			card->pcsc_error = SCardGetAttrib(card->card_handle, attribute_id, (LPSTR)attribute_buffer, &attribute_length);
 			if(card->pcsc_error == SCARD_S_SUCCESS) {
-				VALUE rbAttribute = rb_str_new(attribute_buffer, attribute_length);
+				rbAttribute = rb_str_new(attribute_buffer, attribute_length);
 				xfree(attribute_buffer);
 				return rbAttribute;
 			}
@@ -210,13 +222,16 @@ static VALUE PCSC_Card_get_attribute(VALUE self, VALUE rbAttributeId) {
  * +attribute_value+:: the value to be assigned to the attribute; wrap the bytes in a string-like object (low-level API, remember?)
  */
 static VALUE PCSC_Card_set_attribute(VALUE self, VALUE rbAttributeId, VALUE rbAttributeValue) {
-	struct SCardHandleEx *card;	
+	struct SCardHandleEx *card;
+	DWORD attribute_id;
+	VALUE rbFinalAttributeValue;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return self;
 	
-	DWORD attribute_id = NUM2UINT(rbAttributeId);
+	attribute_id = NUM2UINT(rbAttributeId);
 
-	VALUE rbFinalAttributeValue = rb_check_string_type(rbAttributeValue);
+	rbFinalAttributeValue = rb_check_string_type(rbAttributeValue);
 	if(NIL_P(rbFinalAttributeValue)) {
 		rb_raise(rb_eArgError, "second argument (attribute buffer) does not convert to a String");
 		return self;
@@ -242,35 +257,38 @@ static VALUE PCSC_Card_set_attribute(VALUE self, VALUE rbAttributeId, VALUE rbAt
  * +recv_io_request+:: Smartcard::PCSC::IoRequest instance receving information about the recv protocol; you can use the result of Smartcard::PCSC::IoRequest#new
  */
 static VALUE PCSC_Card_transmit(VALUE self, VALUE rbSendData, VALUE rbSendIoRequest, VALUE rbRecvIoRequest) {
-	struct SCardHandleEx *card;	
+	struct SCardHandleEx *card;
+	VALUE rbFinalSendData, rbRecvData;
+	SCARD_IO_REQUEST *send_io_request, *recv_io_request;
+	char *recv_buffer;
+	DWORD recv_length;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return Qnil;
 	
-	VALUE rbFinalSendData = rb_check_string_type(rbSendData);
+	rbFinalSendData = rb_check_string_type(rbSendData);
 	if(NIL_P(rbFinalSendData)) {
 		rb_raise(rb_eArgError, "first argument (send buffer) does not convert to a String");
 		return Qnil;
 	}
 	
-	SCARD_IO_REQUEST *send_io_request;
 	if(_PCSC_IoRequest_lowlevel_get(rbSendIoRequest, &send_io_request) == 0) {
 		rb_raise(rb_eArgError, "second argument (send io request) is not an IoRequest instance");
 		return Qnil;	
 	}	
-	SCARD_IO_REQUEST *recv_io_request;
 	if(_PCSC_IoRequest_lowlevel_get(rbRecvIoRequest, &recv_io_request) == 0) {
 		rb_raise(rb_eArgError, "second argument (recv io request) is not an IoRequest instance");
 		return Qnil;	
 	}
 	
 #if defined(PCSCLITE_MAX_MESSAGE_SIZE)
-	DWORD recv_length = PCSCLITE_MAX_MESSAGE_SIZE;
+	recv_length = PCSCLITE_MAX_MESSAGE_SIZE;
 #elif defined(MAX_BUFFER_SIZE_EXTENDED)
-	DWORD recv_length = MAX_BUFFER_SIZE_EXTENDED;
+	recv_length = MAX_BUFFER_SIZE_EXTENDED;
 #else
-	DWORD recv_length = 65536;
+	recv_length = 65536;
 #endif
-	char *recv_buffer = ALLOC_N(char, recv_length);
+	recv_buffer = ALLOC_N(char, recv_length);
 	if(recv_buffer == NULL) return Qnil;
 	
 	card->pcsc_error = SCardTransmit(card->card_handle, send_io_request,
@@ -282,7 +300,7 @@ static VALUE PCSC_Card_transmit(VALUE self, VALUE rbSendData, VALUE rbSendIoRequ
 		return Qnil;
 	}
 
-	VALUE rbRecvData = rb_str_new(recv_buffer, recv_length);
+	rbRecvData = rb_str_new(recv_buffer, recv_length);
 	xfree(recv_buffer);
 	return rbRecvData;			
 }
@@ -308,18 +326,22 @@ static VALUE PCSC_Card_transmit(VALUE self, VALUE rbSendData, VALUE rbSendIoRequ
  */
 static VALUE PCSC_Card_control(VALUE self, VALUE rbControlCode, VALUE rbSendData, VALUE rbMaxRecvBytes) {
 	struct SCardHandleEx *card;	
+	VALUE rbFinalSendData, rbRecvData;
+	char *recv_buffer;
+	DWORD control_code, recv_length;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return Qnil;
 	
-	VALUE rbFinalSendData = rb_check_string_type(rbSendData);
+	rbFinalSendData = rb_check_string_type(rbSendData);
 	if(NIL_P(rbFinalSendData)) {
 		rb_raise(rb_eArgError, "second argument (send buffer) does not convert to a String");
 		return Qnil;
 	}
 	
-	DWORD control_code = NUM2UINT(rbControlCode);
-	DWORD recv_length = NUM2UINT(rbMaxRecvBytes);
-	char *recv_buffer = ALLOC_N(char, recv_length);
+	control_code = NUM2UINT(rbControlCode);
+	recv_length = NUM2UINT(rbMaxRecvBytes);
+	recv_buffer = ALLOC_N(char, recv_length);
 	if(recv_buffer == NULL) return Qnil;
 	
 	card->pcsc_error = SCardControl(card->card_handle, control_code,
@@ -331,7 +353,7 @@ static VALUE PCSC_Card_control(VALUE self, VALUE rbControlCode, VALUE rbSendData
 		return Qnil;
 	}
 
-	VALUE rbRecvData = rb_str_new(recv_buffer, recv_length);
+	rbRecvData = rb_str_new(recv_buffer, recv_length);
 	xfree(recv_buffer);
 	return rbRecvData;			
 }
@@ -352,21 +374,24 @@ static VALUE _rbStateKey, _rbProtocolKey, _rbAtrKey, _rbReaderNamesKey;
  * <tt>:reader_names</tt> :: array of strings containing all the names of the reader containing the smartcard
  */
 static VALUE PCSC_Card_status(VALUE self) {
-	struct SCardHandleEx *card;	
+	struct SCardHandleEx *card;
+	char *atr_buffer, *reader_names_buffer;
+	DWORD atr_length, reader_names_length, state, protocol;
+	VALUE rbStateVal, rbProtocolVal, rbAtrVal, rbReaderNamesVal, rbReturnHash;
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return Qnil;
 
-	DWORD atr_length = MAX_ATR_SIZE;
-	char *atr_buffer = ALLOC_N(char, atr_length);	
-	DWORD reader_names_length = 4096;
-	char *reader_names_buffer = ALLOC_N(char, reader_names_length);
+	atr_length = MAX_ATR_SIZE;
+	atr_buffer = ALLOC_N(char, atr_length);	
+	reader_names_length = 4096;
+	reader_names_buffer = ALLOC_N(char, reader_names_length);
 	if(atr_buffer == NULL || reader_names_buffer == NULL) {
 		if(reader_names_buffer != NULL) xfree(reader_names_buffer);
 		if(atr_buffer != NULL) xfree(atr_buffer);
 		return Qnil;
 	}
 	
-	DWORD state, protocol;
 	card->pcsc_error = SCardStatus(card->card_handle, reader_names_buffer, &reader_names_length, &state, &protocol, (LPSTR)atr_buffer, &atr_length);
 	if(card->pcsc_error != SCARD_S_SUCCESS) {
 		xfree(reader_names_buffer); xfree(atr_buffer);
@@ -374,12 +399,12 @@ static VALUE PCSC_Card_status(VALUE self) {
 		return Qnil;
 	}
 	
-	VALUE rbStateVal = UINT2NUM(state);
-	VALUE rbProtocolVal = UINT2NUM(protocol);
-	VALUE rbAtrVal = rb_str_new(atr_buffer, atr_length);
-	VALUE rbReaderNamesVal = PCSC_Internal_multistring_to_ruby_array(reader_names_buffer, reader_names_length);
+	rbStateVal = UINT2NUM(state);
+	rbProtocolVal = UINT2NUM(protocol);
+	rbAtrVal = rb_str_new(atr_buffer, atr_length);
+	rbReaderNamesVal = PCSC_Internal_multistring_to_ruby_array(reader_names_buffer, reader_names_length);
 	
-	VALUE rbReturnHash = rb_hash_new();
+	rbReturnHash = rb_hash_new();
 	rb_hash_aset(rbReturnHash, _rbStateKey, rbStateVal);
 	rb_hash_aset(rbReturnHash, _rbProtocolKey, rbProtocolVal);
 	rb_hash_aset(rbReturnHash, _rbAtrKey, rbAtrVal);
@@ -398,6 +423,7 @@ static VALUE PCSC_Card_status(VALUE self) {
  */
 static VALUE PCSC_Card_last_error(VALUE self) {
 	struct SCardHandleEx *card;	
+	
 	Data_Get_Struct(self, struct SCardHandleEx, card);
 	if(card == NULL) return Qnil;
 
@@ -414,16 +440,18 @@ static VALUE PCSC_Card_last_error(VALUE self) {
  * Wraps a _SCARDHANDLE_ structure.
  */
 void Init_PCSC_Card() {
-	ID state_id = rb_intern("status"); _rbStateKey = ID2SYM(state_id);
-	ID protocol_id = rb_intern("protocol"); _rbProtocolKey = ID2SYM(protocol_id);
-	ID atr_id = rb_intern("atr"); _rbAtrKey = ID2SYM(atr_id);
-	ID reader_names_id = rb_intern("reader_names"); _rbReaderNamesKey = ID2SYM(reader_names_id);
+	ID state_id, protocol_id, atr_id, reader_names_id;
+	
+	state_id = rb_intern("status"); _rbStateKey = ID2SYM(state_id);
+	protocol_id = rb_intern("protocol"); _rbProtocolKey = ID2SYM(protocol_id);
+	atr_id = rb_intern("atr"); _rbAtrKey = ID2SYM(atr_id);
+	reader_names_id = rb_intern("reader_names"); _rbReaderNamesKey = ID2SYM(reader_names_id);
 	
 	cPcscCard = rb_define_class_under(mPcsc, "Card", rb_cObject);
 	rb_define_alloc_func(cPcscCard, PCSC_Card_alloc);
 	rb_define_method(cPcscCard, "initialize", PCSC_Card_initialize, 4);
-	rb_define_method(cPcscCard, "reconnect", PCSC_Card_reconnect, 3);	
 	rb_define_method(cPcscCard, "disconnect", PCSC_Card_disconnect, 1);	
+	rb_define_method(cPcscCard, "reconnect", PCSC_Card_reconnect, 3);	
 	rb_define_method(cPcscCard, "begin_transaction", PCSC_Card_begin_transaction, 0);	
 	rb_define_method(cPcscCard, "end_transaction", PCSC_Card_end_transaction, 1);
 	rb_define_method(cPcscCard, "get_attribute", PCSC_Card_get_attribute, 1);	
@@ -436,10 +464,11 @@ void Init_PCSC_Card() {
 
 /* Retrieves the SCARDHANDLE wrapped into a Smartcard::PCSC::Card instance. */
 int _PCSC_Card_lowlevel_get(VALUE rbCard, SCARDHANDLE *card_handle) {
+	struct SCardHandleEx *card;	
+
 	if(TYPE(rbCard) != T_DATA || RDATA(rbCard)->dfree != (void (*)(void *))PCSC_Card_free)
 		return 0;
 	
-	struct SCardHandleEx *card;	
 	Data_Get_Struct(rbCard, struct SCardHandleEx, card);
 	*card_handle = card->card_handle;
 	return 1;

@@ -10,10 +10,10 @@ struct PCSCReaderStates {
 
 /* Custom free for Smartcard::PCSC::ReaderStates. Also releases the referenced buffers (for the reader names). */
 static void PCSC_ReaderStates_free(struct PCSCReaderStates *_states) {
+	size_t i;
 	if(_states != NULL) {
 		if(_states->states != NULL) {
-			size_t i = 0;
-			for(; i < _states->states_count; i++) {
+			for(i = 0; i < _states->states_count; i++) {
 				if(_states->states[i].szReader != NULL)
 					xfree((char *)_states->states[i].szReader);
 			}
@@ -42,15 +42,16 @@ static VALUE PCSC_ReaderStates_alloc(VALUE klass) {
  */
 static VALUE PCSC_ReaderStates_initialize(VALUE self, VALUE rbNumStates) {
 	struct PCSCReaderStates *states;	
+	size_t states_count, i;
+	
 	Data_Get_Struct(self, struct PCSCReaderStates, states);
 	
-	size_t states_count = NUM2UINT(rbNumStates);
+	states_count = NUM2UINT(rbNumStates);
 	if(states_count > 0) {
 		states->states = ALLOC_N(SCARD_READERSTATE, states_count);
 		if(states->states != NULL) {
 			states->states_count = states_count;
-			size_t i = 0;
-			for(; i < states_count; i++) {
+			for(i = 0; i < states_count; i++) {
 				states->states[i].szReader = NULL;
 				states->states[i].dwCurrentState = SCARD_STATE_UNAWARE;
 			}
@@ -86,6 +87,7 @@ static int _validate_readerstates_args(VALUE rbReaderStates, VALUE rbIndex, stru
 static VALUE PCSC_ReaderStates_current_state_of(VALUE self, VALUE rbIndex) {
 	struct PCSCReaderStates *states;
 	size_t index;
+	
 	if(_validate_readerstates_args(self, rbIndex, &states, &index) == 0)
 		return Qnil;
 	
@@ -106,6 +108,7 @@ static VALUE PCSC_ReaderStates_current_state_of(VALUE self, VALUE rbIndex) {
 static VALUE PCSC_ReaderStates_event_state_of(VALUE self, VALUE rbIndex) {
 	struct PCSCReaderStates *states;
 	size_t index;
+	
 	if(_validate_readerstates_args(self, rbIndex, &states, &index) == 0)
 		return Qnil;
 	
@@ -126,6 +129,7 @@ static VALUE PCSC_ReaderStates_event_state_of(VALUE self, VALUE rbIndex) {
 static VALUE PCSC_ReaderStates_set_current_state_of(VALUE self, VALUE rbIndex, VALUE rbCurrentState) {
 	struct PCSCReaderStates *states;
 	size_t index;
+	
 	if(_validate_readerstates_args(self, rbIndex, &states, &index) == 0)
 		return self;
 
@@ -146,6 +150,7 @@ static VALUE PCSC_ReaderStates_set_current_state_of(VALUE self, VALUE rbIndex, V
 static VALUE PCSC_ReaderStates_set_event_state_of(VALUE self, VALUE rbIndex, VALUE rbEventState) {
 	struct PCSCReaderStates *states;
 	size_t index;
+	
 	if(_validate_readerstates_args(self, rbIndex, &states, &index) == 0)
 		return self;
 
@@ -167,6 +172,7 @@ static VALUE PCSC_ReaderStates_set_event_state_of(VALUE self, VALUE rbIndex, VAL
 static VALUE PCSC_ReaderStates_atr_of(VALUE self, VALUE rbIndex) {
 	struct PCSCReaderStates *states;
 	size_t index;
+	
 	if(_validate_readerstates_args(self, rbIndex, &states, &index) == 0)
 		return Qnil;
 	
@@ -186,10 +192,12 @@ static VALUE PCSC_ReaderStates_atr_of(VALUE self, VALUE rbIndex) {
 static VALUE PCSC_ReaderStates_set_atr_of(VALUE self, VALUE rbIndex, VALUE rbAtr) {
 	struct PCSCReaderStates *states;
 	size_t index;
+	VALUE rbFinalAtr;
+	
 	if(_validate_readerstates_args(self, rbIndex, &states, &index) == 0)
 		return self;
 	
-	VALUE rbFinalAtr = rb_check_string_type(rbAtr);
+	rbFinalAtr = rb_check_string_type(rbAtr);
 	if(NIL_P(rbFinalAtr))
 		return self;
 
@@ -215,6 +223,7 @@ static VALUE PCSC_ReaderStates_set_atr_of(VALUE self, VALUE rbIndex, VALUE rbAtr
 static VALUE PCSC_ReaderStates_reader_name_of(VALUE self, VALUE rbIndex) {
 	struct PCSCReaderStates *states;
 	size_t index;
+	
 	if(_validate_readerstates_args(self, rbIndex, &states, &index) == 0)
 		return Qnil;
 	
@@ -233,15 +242,17 @@ static VALUE PCSC_ReaderStates_reader_name_of(VALUE self, VALUE rbIndex) {
  */
 static VALUE PCSC_ReaderStates_set_reader_name_of(VALUE self, VALUE rbIndex, VALUE rbReaderName) {
 	struct PCSCReaderStates *states;
-	size_t index;
+	size_t index, reader_name_length;
+	VALUE rbFinalReaderName;
+	
 	if(_validate_readerstates_args(self, rbIndex, &states, &index) == 0)
 		return self;
 	
-	VALUE rbFinalReaderName = rb_check_string_type(rbReaderName);
+	rbFinalReaderName = rb_check_string_type(rbReaderName);
 	if(NIL_P(rbFinalReaderName))
 		return self;
 
-	size_t reader_name_length = RSTRING(rbFinalReaderName)->len;
+	reader_name_length = RSTRING(rbFinalReaderName)->len;
 	if(states->states[index].szReader != NULL)
 		xfree((char *)states->states[index].szReader);
 	states->states[index].szReader = ALLOC_N(char, reader_name_length + 1);
@@ -261,11 +272,12 @@ static VALUE PCSC_ReaderStates_set_reader_name_of(VALUE self, VALUE rbIndex, VAL
  * (and thus prepare for a new call). 
  */
 static VALUE PCSC_ReaderStates_acknowledge_events(VALUE self) {
-	struct PCSCReaderStates *states;	
+	struct PCSCReaderStates *states;
+	size_t i;
+	
 	Data_Get_Struct(self, struct PCSCReaderStates, states);
 	if(states != NULL) {
-		size_t i = 0;
-		for(; i < states->states_count; i++)
+		for(i = 0; i < states->states_count; i++)
 			states->states[i].dwCurrentState = states->states[i].dwEventState; 
 	}
 	return self;
@@ -297,6 +309,8 @@ void Init_PCSC_ReaderStates() {
 
 /* Retrieves the SCARD_READERSTATE array wrapped into a Smartcard::PCSC::ReaderStates instance. */
 int _PCSC_ReaderStates_lowlevel_get(VALUE rbReaderStates, SCARD_READERSTATE **reader_states, size_t *reader_states_count) {
+	struct PCSCReaderStates *states;	
+
 	if(TYPE(rbReaderStates) == T_NIL || TYPE(rbReaderStates) == T_FALSE) {
 		*reader_states = NULL;
 		*reader_states_count = 0;
@@ -305,7 +319,6 @@ int _PCSC_ReaderStates_lowlevel_get(VALUE rbReaderStates, SCARD_READERSTATE **re
 	if(TYPE(rbReaderStates) != T_DATA || RDATA(rbReaderStates)->dfree != (void (*)(void *))PCSC_ReaderStates_free)
 		return 0;
 	
-	struct PCSCReaderStates *states;	
 	Data_Get_Struct(rbReaderStates, struct PCSCReaderStates, states);
 	*reader_states = states->states;
 	*reader_states_count = states->states_count;

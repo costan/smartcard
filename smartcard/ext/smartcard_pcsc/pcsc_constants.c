@@ -133,16 +133,20 @@ void Init_PCSC_Consts() {
 	/* SCARD_SPECIFIC : PTS has been set. */
 	rb_define_const(mPcsc, "STATUS_SPECIFIC", INT2NUM(SCARD_SPECIFIC));
 	
+#if defined(SCARD_PROTOCOL_UNSET)
 	/* SCARD_PROTOCOL_UNSET : Protocol not set. */
 	rb_define_const(mPcsc, "PROTOCOL_UNSET", INT2NUM(SCARD_PROTOCOL_UNSET));
+#endif /* SCARD_PROTOCOL_UNSET */
 	/* SCARD_PROTOCOL_T0 : T=0 active protocol. */
 	rb_define_const(mPcsc, "PROTOCOL_T0", INT2NUM(SCARD_PROTOCOL_T0));
 	/* SCARD_PROTOCOL_T1 : T=1 active protocol. */
 	rb_define_const(mPcsc, "PROTOCOL_T1", INT2NUM(SCARD_PROTOCOL_T1));
 	/* SCARD_PROTOCOL_RAW : Raw active protocol. */
 	rb_define_const(mPcsc, "PROTOCOL_RAW", INT2NUM(SCARD_PROTOCOL_RAW));
+#if defined(SCARD_PROTOCOL_UNSET)
 	/* SCARD_PROTOCOL_T15 : T=15 protocol. */
 	rb_define_const(mPcsc, "PROTOCOL_T15", INT2NUM(SCARD_PROTOCOL_T15));
+#endif /* SCARD_PROTOCOL_UNSET */
 	/* SCARD_PROTOCOL_ANY : IFD determines protocol. */
 	rb_define_const(mPcsc, "PROTOCOL_ANY", INT2NUM(SCARD_PROTOCOL_ANY));
 
