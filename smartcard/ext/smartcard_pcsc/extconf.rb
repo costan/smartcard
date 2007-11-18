@@ -31,3 +31,21 @@ File.open('pcsc_include.h', 'w') do |f|
 end 
 
 create_makefile('smartcard/pcsc')
+
+def win32_hack(mf_name)
+  # evil, evil, evil -- hack the makefile to embed the manifest in the extension dll
+  make_contents = File.open(mf_name, 'r') { |f| f.read }
+  make_rules = make_contents.split(/(\n|\r)(\n|\r)+/)
+  new_make_rules = make_rules.map do |rule|
+    if rule =~ /^\$\(DLLIB\)\:/
+      rule + "\n\tmt.exe -manifest $(@).manifest -outputresource:$(@);2"
+    else
+      rule
+    end
+  end
+  File.open(mf_name, 'w') { |f| f.write new_make_rules.join("\n\n")}
+end
+
+if RUBY_PLATFORM =~ /win/
+  win32_hack 'Makefile'
+end
