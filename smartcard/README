@@ -1,0 +1,22 @@
+SUMMARY
+
+'smartcard' aims to become the de-facto support library for smart-card development on ruby.
+At the moment, 'smartcard' offers a PC/SC binding that is working on ruby 1.8, under
+linux, osx, and windows. Future plans include a high level abstraction for the PC/SC binding 
+(and any other bindings people need), and an interface for Java cards.
+
+LICENSE
+
+'smartcard' is released under the MIT license. This means you're free to do whatever you want
+with it. For the legalese version, please see the 'LICENSE' file.
+
+DOCUMENTATION
+
+The API is fully documented with RDoc. If you installed the 'smartcard' gem, you should be
+able to use ri to see the documentation. If you're using the SVN version, you can use rdoc to
+build the HTML and RI documentation yourself.
+
+ACKNOWLEDGEMENTS
+
+'smartcard' was developed for Victor Costan while working as a Research Assistant for MIT.
+The work was sponsored by a grant from Quanta Computer Inc (www.quanta.com.tw)
