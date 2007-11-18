@@ -1,0 +1,23 @@
+# Needs the 'echoe' gem
+ 
+require 'echoe'
+Echoe.new('smartcard') do |p|
+  p.project = 'smartcard' # rubyforge project
+  
+  p.author = 'Victor Costan'
+  p.email = 'victor@costan.us'
+  p.summary = 'Interface with ISO 7816 smart cards.'
+  p.url = 'http://www.costan.us/smartcard'
+  
+  p.need_tar_gz = false
+  p.clean_pattern += ['ext/**/*.manifest', 'ext/**/*_autogen.h']
+  
+  p.eval = proc do |p|
+    if RUBY_PLATFORM =~ /win32/
+      p.platform = Gem::Platform::WIN32
+      p.files += ['lib/smartcard/pcsc.so']
+      task :package => [ :clean, :compile ]
+    end
+  end
+ 
+end

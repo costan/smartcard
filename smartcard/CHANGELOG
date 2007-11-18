@@ -1,0 +1,10 @@
+v0.1.2 Added Windows compatibility
+	*.c: restructured code so VC2005 likes it
+	(variable declarations before function body)
+	docs: license, readme, and what the gem is
+
+v0.1.1 Added support for Ubuntu 7.10
+	ext/smartcard_pcsc/extconf.rb: better header
+	detection
+
+v0.1.0 Initial release for OSX Leopard
