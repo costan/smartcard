@@ -25,7 +25,7 @@ end
 
 pcsc_defines = []
 
-File.open('pcsc_include.h', 'w') do |f|
+File.open('pcsc_autogen.h', 'w') do |f|
   pcsc_defines.each { |d| f.write "\#define #{d}\n" }
   pcsc_headers.each { |h| f.write "\#include #{h}\n" }
 end 
