@@ -345,7 +345,10 @@ static VALUE PCSC_Card_control(VALUE self, VALUE rbControlCode, VALUE rbSendData
 	if(recv_buffer == NULL) return Qnil;
 		
 #if defined(RB_SMARTCARD_OSX_TIGER_HACK)
-#error "You're on Tiger!"
+	/* TODO: this will compile and run, but it won't do anything useful */
+	card->pcsc_error = SCardControl(card->card_handle,
+			(LPSTR)RSTRING(rbFinalSendData)->ptr, RSTRING(rbFinalSendData)->len,
+			recv_buffer, recv_length, &recv_length);
 #else
 	card->pcsc_error = SCardControl(card->card_handle, control_code,
 			(LPSTR)RSTRING(rbFinalSendData)->ptr, RSTRING(rbFinalSendData)->len,

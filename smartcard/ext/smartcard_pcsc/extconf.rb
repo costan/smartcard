@@ -8,7 +8,6 @@ pcsc_defines = []
 if RUBY_PLATFORM =~ /darwin/
   $LDFLAGS += ' -framework PCSC'
   darwin_version = `uname -r`
-  pp darwin_version
   if darwin_version =~ /^8./
     pcsc_defines.push 'RB_SMARTCARD_OSX_TIGER_HACK'
   end
