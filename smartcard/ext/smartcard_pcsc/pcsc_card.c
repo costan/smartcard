@@ -348,7 +348,7 @@ static VALUE PCSC_Card_control(VALUE self, VALUE rbControlCode, VALUE rbSendData
 	/* TODO: this will compile and run, but it won't do anything useful */
 	card->pcsc_error = SCardControl(card->card_handle,
 			(LPSTR)RSTRING(rbFinalSendData)->ptr, RSTRING(rbFinalSendData)->len,
-			recv_buffer, recv_length, &recv_length);
+			recv_buffer, &recv_length);
 #else
 	card->pcsc_error = SCardControl(card->card_handle, control_code,
 			(LPSTR)RSTRING(rbFinalSendData)->ptr, RSTRING(rbFinalSendData)->len,
