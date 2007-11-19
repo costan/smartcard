@@ -236,10 +236,15 @@ static VALUE PCSC_Card_set_attribute(VALUE self, VALUE rbAttributeId, VALUE rbAt
 		rb_raise(rb_eArgError, "second argument (attribute buffer) does not convert to a String");
 		return self;
 	}
-	
-	card->pcsc_error = SCardSetAttrib(card->card_handle, attribute_id, (LPSTR)RSTRING(rbFinalAttributeValue)->ptr, RSTRING(rbFinalAttributeValue)->len);	
+
+#if defined(RB_SMARTCARD_OSX_TIGER_HACK)
+	card->pcsc_error = SCARD_F_INTERNAL_ERROR;
+	rb_raise(rb_eRuntimeError, "SCardSetAttrib: not implemented in OSX Tiger");
+#else
+	card->pcsc_error = SCardSetAttrib(card->card_handle, attribute_id, (LPSTR)RSTRING(rbFinalAttributeValue)->ptr, RSTRING(rbFinalAttributeValue)->len);
 	if(card->pcsc_error != SCARD_S_SUCCESS)
 		rb_raise(rb_eRuntimeError, "SCardSetAttrib: %s", pcsc_stringify_error(card->pcsc_error));	
+#endif
 	return self;
 }
 

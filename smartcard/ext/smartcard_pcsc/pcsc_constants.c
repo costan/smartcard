@@ -50,21 +50,21 @@ void Init_PCSC_Consts() {
 	/* SCARD_F_COMM_ERROR : An internal communications error has been detected. */
 	rb_define_const(mPcsc, "SCARD_F_COMM_ERROR", INT2NUM(SCARD_F_COMM_ERROR));
 	/* SCARD_F_UNKNOWN_ERROR : An internal error has been detected, but the source is unknown. */
-	rb_define_const(mPcsc, "SCARD_F_UNKNOWN_ERROR", INT2NUM(SCARD_E_TIMEOUT));
+	rb_define_const(mPcsc, "SCARD_F_UNKNOWN_ERROR", INT2NUM(SCARD_F_UNKNOWN_ERROR));
 	/* SCARD_E_INVALID_ATR : An ATR obtained from the registry is not a valid ATR string. */
-	rb_define_const(mPcsc, "SCARD_E_INVALID_ATR", INT2NUM(SCARD_E_TIMEOUT));
+	rb_define_const(mPcsc, "SCARD_E_INVALID_ATR", INT2NUM(SCARD_E_INVALID_ATR));
 	/* SCARD_E_NOT_TRANSACTED : An attempt was made to end a non-existent transaction. */
-	rb_define_const(mPcsc, "SCARD_E_NOT_TRANSACTED", INT2NUM(SCARD_E_TIMEOUT));
+	rb_define_const(mPcsc, "SCARD_E_NOT_TRANSACTED", INT2NUM(SCARD_E_NOT_TRANSACTED));
 	/* SCARD_E_READER_UNAVAILABLE : The specified reader is not currently available for use. */
-	rb_define_const(mPcsc, "SCARD_E_READER_UNAVAILABLE", INT2NUM(SCARD_E_TIMEOUT));
+	rb_define_const(mPcsc, "SCARD_E_READER_UNAVAILABLE", INT2NUM(SCARD_E_READER_UNAVAILABLE));
 	/* SCARD_W_UNSUPPORTED_CARD : The reader cannot communicate with the card, due to ATR string configuration conflicts. */
-	rb_define_const(mPcsc, "SCARD_W_UNSUPPORTED_CARD", INT2NUM(SCARD_E_TIMEOUT));
+	rb_define_const(mPcsc, "SCARD_W_UNSUPPORTED_CARD", INT2NUM(SCARD_W_UNSUPPORTED_CARD));
 	/* SCARD_W_UNRESPONSIVE_CARD : The smart card is not responding to a reset. */
-	rb_define_const(mPcsc, "SCARD_W_UNRESPONSIVE_CARD", INT2NUM(SCARD_E_TIMEOUT));
+	rb_define_const(mPcsc, "SCARD_W_UNRESPONSIVE_CARD", INT2NUM(SCARD_W_UNRESPONSIVE_CARD));
 	/* SCARD_W_UNPOWERED_CARD : Power has been removed from the smart card, so that further communication is not possible. */
-	rb_define_const(mPcsc, "SCARD_W_UNPOWERED_CARD", INT2NUM(SCARD_E_TIMEOUT));
+	rb_define_const(mPcsc, "SCARD_W_UNPOWERED_CARD", INT2NUM(SCARD_W_UNPOWERED_CARD));
 	/* SCARD_W_RESET_CARD : The smart card has been reset, so any shared state information is invalid. */
-	rb_define_const(mPcsc, "SCARD_W_RESET_CARD", INT2NUM(SCARD_E_TIMEOUT));
+	rb_define_const(mPcsc, "SCARD_W_RESET_CARD", INT2NUM(SCARD_W_RESET_CARD));
 	/* SCARD_W_REMOVED_CARD : The smart card has been removed, so further communication is not possible. */
 	rb_define_const(mPcsc, "SCARD_W_REMOVED_CARD", INT2NUM(SCARD_W_REMOVED_CARD));
 	/* SCARD_E_PCI_TOO_SMALL : The PCI Receive buffer was too small. */
