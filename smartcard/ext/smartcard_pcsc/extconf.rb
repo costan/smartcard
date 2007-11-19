@@ -3,8 +3,15 @@ require 'mkmf'
 $CFLAGS ||= ''
 $LDFLAGS ||= ''
 
+pcsc_defines = []
+
 if RUBY_PLATFORM =~ /darwin/
   $LDFLAGS += ' -framework PCSC'
+  darwin_version = `uname -r`
+  pp darwin_version
+  if darwin_version =~ /^8./
+    pcsc_defines.push 'RB_SMARTCARD_OSX_TIGER_HACK'
+  end
 elsif RUBY_PLATFORM =~ /win/
   have_library('winscard')
 else
@@ -22,8 +29,6 @@ pcsc_headers = []
     end
   end
 end
-
-pcsc_defines = []
 
 File.open('pcsc_autogen.h', 'w') do |f|
   pcsc_defines.each { |d| f.write "\#define #{d}\n" }

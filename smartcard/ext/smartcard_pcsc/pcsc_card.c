@@ -343,10 +343,14 @@ static VALUE PCSC_Card_control(VALUE self, VALUE rbControlCode, VALUE rbSendData
 	recv_length = NUM2UINT(rbMaxRecvBytes);
 	recv_buffer = ALLOC_N(char, recv_length);
 	if(recv_buffer == NULL) return Qnil;
-	
+		
+#if defined(RB_SMARTCARD_OSX_TIGER_HACK)
+#error "You're on Tiger!"
+#else
 	card->pcsc_error = SCardControl(card->card_handle, control_code,
 			(LPSTR)RSTRING(rbFinalSendData)->ptr, RSTRING(rbFinalSendData)->len,
 			recv_buffer, recv_length, &recv_length);
+#endif
 	if(card->pcsc_error != SCARD_S_SUCCESS) {
 		xfree(recv_buffer);
 		rb_raise(rb_eRuntimeError, "SCardControl: %s", pcsc_stringify_error(card->pcsc_error));
