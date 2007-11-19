@@ -192,6 +192,10 @@ static VALUE PCSC_Card_get_attribute(VALUE self, VALUE rbAttributeId) {
 	
 	attribute_id = NUM2UINT(rbAttributeId);
 	attribute_length;
+#if defined(RB_SMARTCARD_OSX_TIGER_HACK)
+	card->pcsc_error = SCARD_F_INTERNAL_ERROR;
+	rb_raise(rb_eRuntimeError, "SCardSetAttrib: not implemented in OSX Tiger");
+#else
 	card->pcsc_error = SCardGetAttrib(card->card_handle, attribute_id, NULL, &attribute_length);
 	if(card->pcsc_error == SCARD_S_SUCCESS) {
 		attribute_buffer = ALLOC_N(char, attribute_length);
@@ -206,6 +210,7 @@ static VALUE PCSC_Card_get_attribute(VALUE self, VALUE rbAttributeId) {
 	}
 	if(card->pcsc_error != SCARD_S_SUCCESS)
 		rb_raise(rb_eRuntimeError, "SCardGetAttrib: %s", pcsc_stringify_error(card->pcsc_error));	
+#endif
 	return Qnil;
 }
 
