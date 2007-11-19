@@ -90,10 +90,10 @@ static VALUE PCSC_Context_is_valid(VALUE self) {
 	if(context == NULL) return self;
 
 #if defined(RB_SMARTCARD_OSX_TIGER_HACK)	
+	return Qtrue;
+#else
 	context->pcsc_error = SCardIsValidContext(context->pcsc_context);
 	return (context->pcsc_error == SCARD_S_SUCCESS) ? Qtrue : Qfalse;
-#else
-	return Qtrue;
 #endif
 }
 
