@@ -46,6 +46,8 @@ def win32_hack(mf_name)
   File.open(mf_name, 'w') { |f| f.write new_make_rules.join("\n\n")}
 end
 
-if RUBY_PLATFORM =~ /win/
+case RUBY_PLATFORM
+when /darwin/
+when /win/
   win32_hack 'Makefile'
 end
