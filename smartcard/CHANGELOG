@@ -1,3 +1,7 @@
+v0.2.0 Added automatic builds
+	Rakefile for auto builds using echoe
+	extconf.rb: hack to fix Windows makefiles 
+
 v0.1.2 Added Windows compatibility
 	*.c: restructured code so VC2005 likes it
 	(variable declarations before function body)
