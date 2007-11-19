@@ -99,7 +99,11 @@ card0 = Smartcard::PCSC::Card.new(context, reader0, Smartcard::PCSC::SHARE_SHARE
 card0.begin_transaction
 card0.end_transaction Smartcard::PCSC::DISPOSITION_LEAVE
 
+begin
 card0.reconnect Smartcard::PCSC::SHARE_EXCLUSIVE, Smartcard::PCSC::PROTOCOL_ANY, Smartcard::PCSC::INITIALIZATION_RESET
+rescue RuntimeException => e
+puts "Card.reconnect threw exception #{e}\n" 
+end
 
 card_status = card0.status
 pp card_status
