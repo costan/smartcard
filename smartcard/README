@@ -7,7 +7,7 @@ Linux, OSX, and Windows. Future plans include a high level abstraction for the P
 
 	gem install smartcard
 Windows:: Select the <tt>win32</tt> gem.
-OSX:: Install the Developer Tools to get +gcc+.
+OSX:: Install the Developer Tools to get +gcc+. Requires Tiger or Leopard.
 UNIX:: You need a PC/SC provider. See the {BUILD file}[link://files/BUILD.html] for details. The file also contains package lists for popular distributions.
 
 = Documentation

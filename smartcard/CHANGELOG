@@ -1,3 +1,7 @@
+v0.2.1 Added OSX Tiger support
+	Many workarounds for Tiger's buggy/incomplete PC/SC.
+	Small bugfixes for PC/SC status constants.
+
 v0.2.0 Added automatic builds
 	Rakefile for auto builds using echoe
 	extconf.rb: hack to fix Windows makefiles 

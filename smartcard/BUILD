@@ -21,7 +21,13 @@ On the other hand, you have to <tt>gem install echoe</tt> to be able to build an
 You need to install the Developer Tools to get gcc.
 
 Leopard includes a working PC/SC provider, as well as a good driver for CCID readers.
-Tiger's PC/SC implementation is supposed to be subtly broken, but common APDU exchanges work.
+Tiger's PC/SC implementation is broken and incomplete, so the Ruby extension code in +smartcard+
+has a few hacks to work around that (look for the <tt>RB_SMARTCARD_OSX_TIGER_HACK</tt> define.
+The following commands are broken / don't work:
+* Smartcard::PCSC::Context#is_valid (always returs +true+)
+* Smartcard::PCSC::Card#get_attribute (throws exception because it's not implemented)
+* Smartcard::PCSC::Card#set_attribute (throws exception because it's not implemented)
+* Smartcard::PCSC::Card#control (Tiger's API is broken, so the call will probably not work)
 
 The developer team doesn't support or test against ports of +gcc+ or +pcsclite+,
 but we success notifications are welcome.
