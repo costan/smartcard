@@ -1,22 +1,29 @@
-SUMMARY
++smartcard+ aims to become the standard support library for smart-card development on ruby.
+Right now, the project offers a PC/SC binding that is working on ruby 1.8, under
+Linux, OSX, and Windows. Future plans include a high level abstraction for the PC/SC binding 
+(plus any other bindings people need), and an interface for Java cards.
 
-'smartcard' aims to become the de-facto support library for smart-card development on ruby.
-At the moment, 'smartcard' offers a PC/SC binding that is working on ruby 1.8, under
-linux, osx, and windows. Future plans include a high level abstraction for the PC/SC binding 
-(and any other bindings people need), and an interface for Java cards.
+= Installation
 
-LICENSE
+	gem install smartcard
+Windows:: Select the <tt>win32</tt> gem.
+OSX:: Install the Developer Tools to get +gcc+.
+UNIX:: You need a PC/SC provider. See the {BUILD file}[link://files/BUILD.html] for details. The file also contains package lists for popular distributions.
 
-'smartcard' is released under the MIT license. This means you're free to do whatever you want
-with it. For the legalese version, please see the 'LICENSE' file.
+= Documentation
 
-DOCUMENTATION
+The documentation you see was generated with RDoc. If you install the +smartcard+ gem, you should be
+able to use ri to see the documentation. If you're using the SVN version, you can <tt>rake doc</tt> to build
+the HTML documentation yourself.
 
-The API is fully documented with RDoc. If you installed the 'smartcard' gem, you should be
-able to use ri to see the documentation. If you're using the SVN version, you can use rdoc to
-build the HTML and RI documentation yourself.
+= License
 
-ACKNOWLEDGEMENTS
++smartcard+ is released under the MIT license. This means you're free to do whatever you want
+with it. However, it'd be nice to let the developers know if you plan to include this in a
+distribution (bragging rights are always good). The {LICENSE file}[link://files/LICENSE.html]
+has the license in legalese.
 
-'smartcard' was developed for Victor Costan while working as a Research Assistant for MIT.
-The work was sponsored by a grant from Quanta Computer Inc (www.quanta.com.tw)
+= Acknowledgements
+
++smartcard+ is developed by Victor Costan while working as a Research Assistant for MIT.
+The work is sponsored by a grant from Quanta Computer Inc (www.quanta.com.tw)

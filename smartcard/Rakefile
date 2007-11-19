@@ -1,5 +1,6 @@
 # Needs the 'echoe' gem
 require 'echoe'
+require 'pp'
 
 Echoe.new('smartcard') do |p|
   p.project = 'smartcard' # rubyforge project
@@ -11,6 +12,7 @@ Echoe.new('smartcard') do |p|
   
   p.need_tar_gz = false
   p.clean_pattern += ['ext/**/*.manifest', 'ext/**/*_autogen.h']
+  p.rdoc_pattern = /^(lib|bin|tasks|ext)|^BUILD|^README|^CHANGELOG|^TODO|^LICENSE|^COPYING$/
   
   p.eval = proc do |p|
     case RUBY_PLATFORM
