@@ -113,8 +113,10 @@ void Init_PCSC_Consts() {
 	rb_define_const(mPcsc, "STATE_INUSE", INT2NUM(SCARD_STATE_INUSE));
 	/* SCARD_STATE_MUTE : Unresponsive card. */
 	rb_define_const(mPcsc, "STATE_MUTE", INT2NUM(SCARD_STATE_MUTE));
+#if defined(SCARD_STATE_UNPOWERED)
 	/* SCARD_STATE_UNPOWERED : Unpowered card. */
 	rb_define_const(mPcsc, "STATE_UNPOWERED", INT2NUM(SCARD_STATE_UNPOWERED));
+#endif /* SCARD_STATE_UNPOWERED */
 	
 	/* INFINITE : Infinite timeout. */
 	rb_define_const(mPcsc, "INFINITE_TIMEOUT", INT2NUM(INFINITE));
