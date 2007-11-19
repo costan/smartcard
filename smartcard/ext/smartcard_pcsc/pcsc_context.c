@@ -89,8 +89,12 @@ static VALUE PCSC_Context_is_valid(VALUE self) {
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	if(context == NULL) return self;
 
-	context->pcsc_error = SCardIsValidContext(context->pcsc_context);		
+#if defined(RB_SMARTCARD_OSX_TIGER_HACK)	
+	context->pcsc_error = SCardIsValidContext(context->pcsc_context);
 	return (context->pcsc_error == SCARD_S_SUCCESS) ? Qtrue : Qfalse;
+#else
+	return Qtrue;
+#endif
 }
 
 /* :Document-method: list_reader_groups
