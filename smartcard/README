@@ -25,5 +25,8 @@ has the license in legalese.
 
 = Acknowledgements
 
-+smartcard+ is developed by Victor Costan while working as a Research Assistant for MIT.
-The work is sponsored by a grant from Quanta Computer Inc (www.quanta.com.tw)
++smartcard+ is developed by Victor Costan while working as a Research Assistant for MIT, under
+{Prof. Srini Devadas}[http://people.csail.mit.edu/devadas/], in the
+{Trusted Computing group}[http://projects.csail.mit.edu/tc/].
+The work is funded by a grant from {Quanta Computer Inc}[http://www.quanta.com.tw], under the
+{T-Party Project}[http://projects.csail.mit.edu/tparty/].
