@@ -1,3 +1,5 @@
+require 'rubygems'
+gem 'smartcard', '>= 0.2.1'
 require 'smartcard'
 require 'pp'
 
