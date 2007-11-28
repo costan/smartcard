@@ -186,10 +186,10 @@ void Init_PCSC_Consts() {
 	/* SCARD_ATTR_MAXINPUT : Maximum size of an APDU supported by the reader. */
 	rb_define_const(mPcsc, "ATTR_MAXINPUT", INT2NUM(SCARD_ATTR_MAXINPUT));	
 	
-	
-	/*
-#define 	SCARD_PCI_T0   (&g_rgSCardT0Pci)
-#define 	SCARD_PCI_T1   (&g_rgSCardT1Pci)
-#define 	SCARD_PCI_RAW   (&g_rgSCardRawPci)
- 	*/ 	
+	/* SCARD_PCI_T0 : IoRequest for transmitting using the T=0 protocol. */
+	rb_define_const(mPcsc, "IOREQUEST_T0", _PCSC_IoRequest_lowlevel_new(SCARD_PCI_T0));
+	/* SCARD_PCI_T1 : IoRequest for transmitting using the T=1 protocol. */
+	rb_define_const(mPcsc, "IOREQUEST_T1", _PCSC_IoRequest_lowlevel_new(SCARD_PCI_T1));
+	/* SCARD_PCI_RAW : IoRequest for transmitting using the RAW protocol. */
+	rb_define_const(mPcsc, "IOREQUEST_T0", _PCSC_IoRequest_lowlevel_new(SCARD_PCI_RAW));
 }

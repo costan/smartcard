@@ -19,6 +19,7 @@ int _PCSC_ReaderStates_lowlevel_get(VALUE rbReaderStates, SCARD_READERSTATE **re
 extern VALUE cPcscIoRequest;
 void Init_PCSC_IoRequest();
 int _PCSC_IoRequest_lowlevel_get(VALUE rbIoRequest, SCARD_IO_REQUEST **io_request);
+VALUE _PCSC_IoRequest_lowlevel_new(SCARD_IO_REQUEST *io_request);
 
 /* Class Smartcard::PCSC::Context */
 extern VALUE cPcscContext;

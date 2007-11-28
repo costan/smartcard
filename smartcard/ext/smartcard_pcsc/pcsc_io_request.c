@@ -2,18 +2,49 @@
 
 VALUE cPcscIoRequest;
 
+/* Wraps a SCARD_IO_REQUEST, tracking its allocation etc. */
+struct SCardIoRequestEx {
+	SCARD_IO_REQUEST *pcsc_request;
+	int mallocd; 
+};
+
 /* Custom free for Smartcard::PCSC::IoRequest. */
-static void PCSC_IoRequest_free(SCARD_IO_REQUEST *_request) {
-	if(_request != NULL)
+static void PCSC_IoRequest_free(struct SCardIoRequestEx *_request) {
+	if(_request != NULL) {
+		if(_request->mallocd)
+			xfree(_request->pcsc_request);
 		xfree(_request);
+	}
 }
 
 /* Custom allocation for Smartcard::PCSC::Card. Wraps a SCARD_IO_REQUEST. */
 static VALUE PCSC_IoRequest_alloc(VALUE klass) {
-	SCARD_IO_REQUEST *request;
+	struct SCardIoRequestEx *request;
 	
-	VALUE rbIoRequest = Data_Make_Struct(klass, SCARD_IO_REQUEST, NULL, PCSC_IoRequest_free, request);
+	VALUE rbIoRequest = Data_Make_Struct(klass, struct SCardIoRequestEx, NULL, PCSC_IoRequest_free, request);
+	request->pcsc_request = NULL;
+	request->mallocd = 0;
 	return rbIoRequest;
+}
+
+/* :Document-method: new
+ * call-seq:
+ *      new() --> io_request
+ * 
+ * Creates an application context connecting to the PC/SC resource manager.
+ * A context is required to access every piece of PC/SC functionality.
+ * Wraps _SCardEstablishContext_ in PC/SC.
+ * 
+ * +scope+:: scope of the context; use one of the Smartcard::PCSC::SCOPE_ constants
+ */
+static VALUE PCSC_IoRequest_initialize(VALUE self) {
+	struct SCardIoRequestEx *request;	
+	
+	Data_Get_Struct(self, struct SCardIoRequestEx, request);
+	request->pcsc_request = ALLOC(SCARD_IO_REQUEST);
+	request->mallocd = 1;
+	
+	return self;
 }
 
 /* :Document-method: protocol
@@ -25,12 +56,12 @@ static VALUE PCSC_IoRequest_alloc(VALUE klass) {
  * The returned protocol is a number, and should be checked against one of the Smartcard::PCSC::PROTOCOL_ constants.
  */
 static VALUE PCSC_IoRequest_get_protocol(VALUE self) {
-	SCARD_IO_REQUEST *request;
+	struct SCardIoRequestEx *request;
 	
-	Data_Get_Struct(self, SCARD_IO_REQUEST, request);
+	Data_Get_Struct(self, struct SCardIoRequestEx, request);
 	if(request == NULL) return Qnil;
 	
-	return UINT2NUM(request->dwProtocol);
+	return UINT2NUM(request->pcsc_request->dwProtocol);
 }
 
 /* :Document-method: protocol=
@@ -42,12 +73,15 @@ static VALUE PCSC_IoRequest_get_protocol(VALUE self) {
  * +protocol+:: use one of the Smartcard::PCSC::PROTOCOL_ constants
  */
 static VALUE PCSC_IoRequest_set_protocol(VALUE self, VALUE rbProtocol) {
-	SCARD_IO_REQUEST *request;
+	struct SCardIoRequestEx *request;
 	
-	Data_Get_Struct(self, SCARD_IO_REQUEST, request);
+	Data_Get_Struct(self, struct SCardIoRequestEx, request);
 	if(request == NULL) return self;
 	
-	request->dwProtocol = NUM2UINT(rbProtocol);
+	if(request->mallocd == 0)
+		rb_raise(rb_eSecurityError, "cannot modify PC/SC-global (read-only) IO_REQUEST");
+	else
+		request->pcsc_request->dwProtocol = NUM2UINT(rbProtocol);
 	return self;
 }
 
@@ -84,4 +118,14 @@ int _PCSC_IoRequest_lowlevel_get(VALUE rbIoRequest, SCARD_IO_REQUEST **io_reques
 	Data_Get_Struct(rbIoRequest, SCARD_IO_REQUEST, request);
 	*io_request = request;
 	return 1;
+}
+
+/* Creates a Smartcard::PCSC::IoRequest instance wrapping a given SCARD_IO_REQUEST. */
+VALUE _PCSC_IoRequest_lowlevel_new(SCARD_IO_REQUEST *io_request) {
+	struct SCardIoRequestEx *request;
+	
+	VALUE rbIoRequest = Data_Make_Struct(cPcscIoRequest, struct SCardIoRequestEx, NULL, PCSC_IoRequest_free, request);
+	request->pcsc_request = io_request;
+	request->mallocd = 0;
+	return rbIoRequest;
 }
