@@ -17,7 +17,7 @@ static void PCSC_IoRequest_free(struct SCardIoRequestEx *_request) {
 	}
 }
 
-/* Custom allocation for Smartcard::PCSC::Card. Wraps a SCARD_IO_REQUEST. */
+/* Custom allocation for Smartcard::PCSC::Card. Wraps a SCardIoRequestEx. */
 static VALUE PCSC_IoRequest_alloc(VALUE klass) {
 	struct SCardIoRequestEx *request;
 	
@@ -31,11 +31,8 @@ static VALUE PCSC_IoRequest_alloc(VALUE klass) {
  * call-seq:
  *      new() --> io_request
  * 
- * Creates an application context connecting to the PC/SC resource manager.
- * A context is required to access every piece of PC/SC functionality.
- * Wraps _SCardEstablishContext_ in PC/SC.
- * 
- * +scope+:: scope of the context; use one of the Smartcard::PCSC::SCOPE_ constants
+ * Creates an uninitialized IoRequest. 
+ * The request can be used as a receiving IoRequest in Smartcard::PCSC::Card#transmit.
  */
 static VALUE PCSC_IoRequest_initialize(VALUE self) {
 	struct SCardIoRequestEx *request;	
@@ -100,13 +97,14 @@ static VALUE PCSC_IoRequest_set_protocol(VALUE self, VALUE rbProtocol) {
 void Init_PCSC_IoRequest() {
 	cPcscIoRequest = rb_define_class_under(mPcsc, "IoRequest", rb_cObject);
 	rb_define_alloc_func(cPcscIoRequest, PCSC_IoRequest_alloc);
+	rb_define_method(cPcscIoRequest, "initialize", PCSC_IoRequest_initialize, 0);	
 	rb_define_method(cPcscIoRequest, "protocol", PCSC_IoRequest_get_protocol, 0);	
 	rb_define_method(cPcscIoRequest, "protocol=", PCSC_IoRequest_set_protocol, 1);	
 }
 
 /* Retrieves the SCARD_IO_REQUEST wrapped into a Smartcard::PCSC::IoRequest instance. */
 int _PCSC_IoRequest_lowlevel_get(VALUE rbIoRequest, SCARD_IO_REQUEST **io_request) {
-	SCARD_IO_REQUEST *request;	
+	struct SCardIoRequestEx *request;	
 
 	if(TYPE(rbIoRequest) == T_NIL || TYPE(rbIoRequest) == T_FALSE) {
 		*io_request = NULL;
@@ -115,8 +113,8 @@ int _PCSC_IoRequest_lowlevel_get(VALUE rbIoRequest, SCARD_IO_REQUEST **io_reques
 	if(TYPE(rbIoRequest) != T_DATA || RDATA(rbIoRequest)->dfree != (void (*)(void *))PCSC_IoRequest_free)
 		return 0;
 	
-	Data_Get_Struct(rbIoRequest, SCARD_IO_REQUEST, request);
-	*io_request = request;
+	Data_Get_Struct(rbIoRequest, struct SCardIoRequestEx, request);
+	*io_request = request->pcsc_request;
 	return 1;
 }
 

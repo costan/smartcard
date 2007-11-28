@@ -191,5 +191,5 @@ void Init_PCSC_Consts() {
 	/* SCARD_PCI_T1 : IoRequest for transmitting using the T=1 protocol. */
 	rb_define_const(mPcsc, "IOREQUEST_T1", _PCSC_IoRequest_lowlevel_new(SCARD_PCI_T1));
 	/* SCARD_PCI_RAW : IoRequest for transmitting using the RAW protocol. */
-	rb_define_const(mPcsc, "IOREQUEST_T0", _PCSC_IoRequest_lowlevel_new(SCARD_PCI_RAW));
+	rb_define_const(mPcsc, "IOREQUEST_RAW", _PCSC_IoRequest_lowlevel_new(SCARD_PCI_RAW));
 }

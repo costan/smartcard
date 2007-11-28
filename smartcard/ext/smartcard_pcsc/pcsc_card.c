@@ -263,7 +263,7 @@ static VALUE PCSC_Card_set_attribute(VALUE self, VALUE rbAttributeId, VALUE rbAt
  * The bytes in the card's response are returned wrapped in a string. (don't complain, it's a low-level API)
  * 
  * +send_data+:: the APDU to be send to the card; wrap the bytes in a string-like object (low-level API, remember?)
- * +send_io_request+:: Smartcard::PCSC::IoRequest instance indicating the send protocol; you should use one of the Smartcard::PCSC::IO_REQUEST_ constants
+ * +send_io_request+:: Smartcard::PCSC::IoRequest instance indicating the send protocol; you should use one of the Smartcard::PCSC::IOREQUEST_ constants
  * +recv_io_request+:: Smartcard::PCSC::IoRequest instance receving information about the recv protocol; you can use the result of Smartcard::PCSC::IoRequest#new
  */
 static VALUE PCSC_Card_transmit(VALUE self, VALUE rbSendData, VALUE rbSendIoRequest, VALUE rbRecvIoRequest) {

@@ -59,7 +59,7 @@ def test_io_request
   io_request = Smartcard::PCSC::IoRequest.new
   [Smartcard::PCSC::PROTOCOL_T0, Smartcard::PCSC::PROTOCOL_T1, Smartcard::PCSC::PROTOCOL_RAW].each do |t_protocol|
     io_request.protocol = t_protocol
-    r_protocol = io_request.protocol 
+    r_protocol = io_request.protocol
     if r_protocol != t_protocol
       puts "FAILED: IoRequest.protocol= / protocol failed for protocol #{t_protocol} (got #{r_protocol} instead)\n"
       return false
@@ -118,9 +118,10 @@ rescue RuntimeError => e
 end
 
 puts "Selecting applet\n"
-aid = [0x19, 0x83, 0x12, 0x29, 0xba, 0xbe]
+aid = [0x19, 0x83, 0x12, 0x29, 0x10, 0xba, 0xbe]
 select_apdu = [0x00, 0xA4, 0x04, 0x00, aid.length, aid].flatten
-send_ioreq = Smartcard::PCSC::IoRequest.new; send_ioreq.protocol = Smartcard::PCSC::PROTOCOL_T1;
+send_ioreq = {Smartcard::PCSC::PROTOCOL_T0 => Smartcard::PCSC::IOREQUEST_T0,
+              Smartcard::PCSC::PROTOCOL_T1 => Smartcard::PCSC::IOREQUEST_T1}[card_status[:protocol]]
 recv_ioreq = Smartcard::PCSC::IoRequest.new
 select_response = card0.transmit(select_apdu.map {|byte| byte.chr}.join(''), send_ioreq, recv_ioreq)
 select_response_str = (0...select_response.length).map { |i| ' %02x' % select_response[i].to_i }.join('')
