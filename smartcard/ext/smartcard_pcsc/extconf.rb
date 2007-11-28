@@ -15,7 +15,7 @@ elsif RUBY_PLATFORM =~ /win/
   have_library('winscard')
 else
   # pcsc is retarded and uses stuff like '#include <wintypes.h>'
-  $CFLAGS += ' -I /usr/include/PCSC -I /usr/local/include/pcsc'
+  $CFLAGS += ' -I /usr/include/PCSC -I /usr/local/include/PCSC'
   have_library('pcsclite')
 end
 

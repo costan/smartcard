@@ -1,6 +1,6 @@
-# Needs the 'echoe' gem
+require 'rubygems'
+gem 'echoe'
 require 'echoe'
-require 'pp'
 
 Echoe.new('smartcard') do |p|
   p.project = 'smartcard' # rubyforge project
@@ -28,4 +28,9 @@ Echoe.new('smartcard') do |p|
       task :package => [ :clean, :compile, :postcompile_hacks ]
     end
   end
+end
+
+if $0 == __FILE__
+  Rake.application = Rake::Application.new
+  Rake.application.run
 end
