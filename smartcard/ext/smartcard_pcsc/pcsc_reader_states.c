@@ -311,7 +311,7 @@ void Init_PCSC_ReaderStates() {
 int _PCSC_ReaderStates_lowlevel_get(VALUE rbReaderStates, SCARD_READERSTATE **reader_states, size_t *reader_states_count) {
 	struct PCSCReaderStates *states;	
 
-	if(TYPE(rbReaderStates) == T_NIL || TYPE(rbReaderStates) == T_FALSE) {
+	if(!RTEST(rbReaderStates)) {
 		*reader_states = NULL;
 		*reader_states_count = 0;
 		return 1;

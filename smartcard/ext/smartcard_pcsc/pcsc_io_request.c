@@ -106,7 +106,7 @@ void Init_PCSC_IoRequest() {
 int _PCSC_IoRequest_lowlevel_get(VALUE rbIoRequest, SCARD_IO_REQUEST **io_request) {
 	struct SCardIoRequestEx *request;	
 
-	if(TYPE(rbIoRequest) == T_NIL || TYPE(rbIoRequest) == T_FALSE) {
+	if(!RTEST(rbIoRequest)) {
 		*io_request = NULL;
 		return 1;
 	}
