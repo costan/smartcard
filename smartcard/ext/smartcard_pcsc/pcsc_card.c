@@ -287,7 +287,7 @@ static VALUE PCSC_Card_transmit(VALUE self, VALUE rbSendData, VALUE rbSendIoRequ
 		return Qnil;	
 	}	
 	if(_PCSC_IoRequest_lowlevel_get(rbRecvIoRequest, &recv_io_request) == 0) {
-		rb_raise(rb_eArgError, "second argument (recv io request) is not an IoRequest instance");
+		rb_raise(rb_eArgError, "third argument (recv io request) is not an IoRequest instance");
 		return Qnil;	
 	}
 	

@@ -5,4 +5,6 @@
 	<pathentry path="GEM_LIB/smartcard-0.1/lib" type="var"/>
 	<pathentry path="GEM_LIB/smartcard-0.2.1/lib" type="var"/>
 	<pathentry path="GEM_LIB/smartcard-0.2.2/lib" type="var"/>
+	<pathentry path="GEM_LIB/echoe-2.7.2/lib" type="var"/>
+	<pathentry path="GEM_LIB/echoe-2.7.5/lib" type="var"/>
 </loadpath>
