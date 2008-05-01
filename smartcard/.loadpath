@@ -8,4 +8,5 @@
 	<pathentry path="GEM_LIB/smartcard-0.2.3-x86-mswin32/lib" type="var"/>
 	<pathentry path="GEM_LIB/smartcard-0.2.3-x86-mswin32/lib" type="var"/>
 	<pathentry path="GEM_LIB/echoe-2.7.11/lib" type="var"/>
+	<pathentry path="GEM_LIB/echoe-2.7.11/lib" type="var"/>
 </loadpath>

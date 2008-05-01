@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'smartcard'
 
-class ContainersTest < Test::Unit::TestCase
+class SmokeTest < Test::Unit::TestCase
   def setup
   end
 
