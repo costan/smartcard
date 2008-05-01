@@ -1,3 +1,5 @@
+v0.3.1. Fixed documentation for the new PcscException class.
+
 v0.3.0. Added PcscException class used to wrap PC/SC exceptions.
 
 v0.2.3. Fixed minor bug in error string for PCSC::Card.transmit 
