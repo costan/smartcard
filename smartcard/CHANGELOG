@@ -1,25 +1,27 @@
-v0.2.3 Fixed minor bug in error string for PCSC::Card.transmit 
+v0.3.0. Added PcscException class used to wrap PC/SC exceptions.
 
-v0.2.2 Fixed APDU exchange bugs on Windows
+v0.2.3. Fixed minor bug in error string for PCSC::Card.transmit 
+
+v0.2.2. Fixed APDU exchange bugs on Windows
 	Restructured PCSC::IoRequest to allow PCI_ consts
 	Added PCI_ consts
 	Changed test suite to reflect proper way to do transmits
 
-v0.2.1 Added OSX Tiger support
+v0.2.1. Added OSX Tiger support
 	Many workarounds for Tiger's buggy/incomplete PC/SC.
 	Small bugfixes for PC/SC status constants.
 
-v0.2.0 Added automatic builds
+v0.2.0. Added automatic builds
 	Rakefile for auto builds using echoe
 	extconf.rb: hack to fix Windows makefiles 
 
-v0.1.2 Added Windows compatibility
+v0.1.2. Added Windows compatibility
 	*.c: restructured code so VC2005 likes it
 	(variable declarations before function body)
 	docs: license, readme, and what the gem is
 
-v0.1.1 Added support for Ubuntu 7.10
+v0.1.1. Added support for Ubuntu 7.10
 	ext/smartcard_pcsc/extconf.rb: better header
 	detection
 
-v0.1.0 Initial release for OSX Leopard
+v0.1.0. Initial release for OSX Leopard

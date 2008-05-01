@@ -1,77 +1,7 @@
-require 'rubygems'
-gem 'smartcard', '>= 0.2.1'
 require 'smartcard'
 require 'pp'
 
-def test_reader_states
-  reader_states = Smartcard::PCSC::ReaderStates.new(2)
-  reader_states.set_current_state_of!(1, Smartcard::PCSC::STATE_ATRMATCH)
-  reader_states.set_current_state_of!(0, Smartcard::PCSC::STATE_CHANGED)
-  reader_states.set_event_state_of!(0, Smartcard::PCSC::STATE_IGNORE)
-  reader_states.set_event_state_of!(1, Smartcard::PCSC::STATE_PRESENT)
-  reader_states.set_atr_of!(1, "Ruby\0rocks!")
-  reader_states.set_atr_of!(0, "grreat success")
-  reader_states.set_reader_name_of!(0, "PC/SC Reader 0")
-  reader_states.set_reader_name_of!(1, "CCID Reader 1")
-  
-  test_state1, test_state0 = reader_states.current_state_of(1), reader_states.current_state_of(0) 
-  if (test_state1 != Smartcard::PCSC::STATE_ATRMATCH) or (test_state0 != Smartcard::PCSC::STATE_CHANGED) 
-    puts "FAILED: ReaderStates.set_current_state_of! / current_state_of returned #{test_state1},#{test_state0} instead of #{Smartcard::PCSC::STATE_ATRMATCH},#{Smartcard::PCSC::STATE_CHANGED}\n"
-    return false
-  end
-  test_state0, test_state1 = reader_states.event_state_of(0), reader_states.event_state_of(1) 
-  if (test_state0 != Smartcard::PCSC::STATE_IGNORE) or (test_state1 != Smartcard::PCSC::STATE_PRESENT) 
-    puts "FAILED: ReaderStates.set_event_state_of! / event_state_of returned #{test_state0},#{test_state1} instead of #{Smartcard::PCSC::STATE_IGNORE},#{Smartcard::PCSC::STATE_PRESENT}\n"
-    return false
-  end
-  test_atr1, test_atr0 = reader_states.atr_of(1), reader_states.atr_of(0)
-  if (test_atr1 != "Ruby\0rocks!") or (test_atr0 != "grreat success") 
-    puts "FAILED: ReaderStates.set_atr_of! / atr_of returned '#{test_atr1}','#{test_atr0}' instead of 'Ruby\\0rocks!','grreat success'\n"
-    return false
-  end
-  test_reader0, test_reader1 = reader_states.reader_name_of(0), reader_states.reader_name_of(1)
-  if (test_reader0 != "PC/SC Reader 0") or (test_reader1 != "CCID Reader 1") 
-    puts "FAILED: ReaderStates.set_reader_name_of! / reader_name_of returned '#{test_reader0}','#{test_reader1}' instead of 'PC/SC Reader 0','CCID Reader 1'\n"
-    return false
-  end
-  
-  [5, 2, nil].each do |bad_index|
-    exception_thrown = false
-    begin
-      reader_states.current_state_of(bad_index)
-    rescue IndexError => e
-      puts "(expected) exception thrown: #{e}\n"
-      exception_thrown = e
-    rescue TypeError => e
-      puts "(expected) exception thrown: #{e}\n"
-      exception_thrown = e
-    end
-    unless exception_thrown
-      puts "FAILED: ReaderStates.current_state_of responded for bad index #{bad_index}\n"
-      return false
-    end
-  end
-  
-  return true
-end
-
-def test_io_request
-  io_request = Smartcard::PCSC::IoRequest.new
-  [Smartcard::PCSC::PROTOCOL_T0, Smartcard::PCSC::PROTOCOL_T1, Smartcard::PCSC::PROTOCOL_RAW].each do |t_protocol|
-    io_request.protocol = t_protocol
-    r_protocol = io_request.protocol
-    if r_protocol != t_protocol
-      puts "FAILED: IoRequest.protocol= / protocol failed for protocol #{t_protocol} (got #{r_protocol} instead)\n"
-      return false
-    end     
-  end
-end
-
-test_reader_states
-test_io_request
-
-
-context = Smartcard::PCSC::Context.new(Smartcard::PCSC::SCOPE_SYSTEM);
+context = Smartcard::PCSC::Context.new(Smartcard::PCSC::SCOPE_SYSTEM)
 
 reader_groups = context.list_reader_groups
 pp reader_groups

@@ -12,9 +12,11 @@ if RUBY_PLATFORM =~ /darwin/
     pcsc_defines.push 'RB_SMARTCARD_OSX_TIGER_HACK'
   end
 elsif RUBY_PLATFORM =~ /win/
+  
   have_library('winscard')
+  pcsc_defines << 'PCSC_SURROGATE_SCARD_IS_VALID_CONTEXT' unless have_library('winscard', 'SCardIsValidContext')
 else
-  # pcsc is retarded and uses stuff like '#include <wintypes.h>'
+  # pcsclite is retarded and uses stuff like '#include <wintypes.h>'
   $CFLAGS += ' -I /usr/include/PCSC -I /usr/local/include/PCSC'
   have_library('pcsclite')
 end
@@ -37,6 +39,17 @@ end
 create_makefile('smartcard/pcsc')
 
 def win32_hack(mf_name)
+  # get the version of MSVC
+  Kernel.system `cl 2> msvc_version.txt`
+  msvc_logo = File.open('msvc_version.txt') { |f| f.read }
+  print msvc_logo
+  File.delete 'msvc_version.txt'
+  if msvc_logo =~ /Optimizing Compiler Version (\d+)/
+    msvc_ver = $1.to_i  
+    # for MSVC 6.0, no manifest BS is needed -- straight-up compilation is good
+    return if msvc_ver == 12
+  end
+    
   # evil, evil, evil -- hack the makefile to embed the manifest in the extension dll
   make_contents = File.open(mf_name, 'r') { |f| f.read }
   make_rules = make_contents.split(/(\n|\r)(\n|\r)+/)

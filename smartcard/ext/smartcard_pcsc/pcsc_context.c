@@ -45,7 +45,7 @@ static VALUE PCSC_Context_initialize(VALUE self, VALUE scope) {
 	
 	context->pcsc_error = SCardEstablishContext(NUM2INT(scope), NULL, NULL, &context->pcsc_context);
 	if(context->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardEstablishContext: %s", pcsc_stringify_error(context->pcsc_error));
+		_PCSC_Exception_raise(context->pcsc_error, "SCardEstablishContext");
 	else
 		context->released = 0;
 	return self;
@@ -69,7 +69,7 @@ static VALUE PCSC_Context_release(VALUE self) {
 		context->pcsc_error = SCardReleaseContext(context->pcsc_context);		
 		context->released = 1;
 		if(context->pcsc_error != SCARD_S_SUCCESS)
-			rb_raise(rb_eRuntimeError, "SCardReleaseContext: %s", pcsc_stringify_error(context->pcsc_error));
+			_PCSC_Exception_raise(context->pcsc_error, "SCardReleaseContext");
 	}
 	return self;
 }
@@ -89,7 +89,7 @@ static VALUE PCSC_Context_is_valid(VALUE self) {
 	Data_Get_Struct(self, struct SCardContextEx, context);
 	if(context == NULL) return self;
 
-#if defined(RB_SMARTCARD_OSX_TIGER_HACK)	
+#if defined(RB_SMARTCARD_OSX_TIGER_HACK) || defined(PCSC_SURROGATE_SCARD_IS_VALID_CONTEXT)	
 	return Qtrue;
 #else
 	context->pcsc_error = SCardIsValidContext(context->pcsc_context);
@@ -130,7 +130,7 @@ static VALUE PCSC_Context_list_reader_groups(VALUE self) {
 		}
 	}
 	if(context->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardListReaderGroups: %s", pcsc_stringify_error(context->pcsc_error));	
+		_PCSC_Exception_raise(context->pcsc_error, "SCardListReaderGroups");
 	return Qnil;
 }
 
@@ -176,8 +176,8 @@ static VALUE PCSC_Context_list_readers(VALUE self, VALUE rbGroups) {
 	}
 	if(groups != NULL) xfree(groups);	
 	if(context->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardListReaders: %s", pcsc_stringify_error(context->pcsc_error));	
-	return Qnil;	
+		_PCSC_Exception_raise(context->pcsc_error, "SCardListReaders");
+	return Qnil;
 }
 
 /* :Document-method: cancel
@@ -195,7 +195,7 @@ static VALUE PCSC_Context_cancel(VALUE self) {
 	
 	context->pcsc_error = SCardCancel(context->pcsc_context);
 	if(context->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardCancel: %s", pcsc_stringify_error(context->pcsc_error));	
+		_PCSC_Exception_raise(context->pcsc_error, "SCardCancel");
 	return self;
 }
 
@@ -232,7 +232,7 @@ static VALUE PCSC_Context_get_status_change(VALUE self, VALUE rbReaderStates, VA
 	else {
 		context->pcsc_error = SCardGetStatusChange(context->pcsc_context, timeout, reader_states, reader_states_count);
 		if(context->pcsc_error != SCARD_S_SUCCESS)
-			rb_raise(rb_eRuntimeError, "SCardCancel: %s", pcsc_stringify_error(context->pcsc_error));
+			_PCSC_Exception_raise(context->pcsc_error, "SCardGetStatusChange");
 	}
 	return self;
 }

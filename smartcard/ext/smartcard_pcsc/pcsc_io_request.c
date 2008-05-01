@@ -119,7 +119,7 @@ int _PCSC_IoRequest_lowlevel_get(VALUE rbIoRequest, SCARD_IO_REQUEST **io_reques
 }
 
 /* Creates a Smartcard::PCSC::IoRequest instance wrapping a given SCARD_IO_REQUEST. */
-VALUE _PCSC_IoRequest_lowlevel_new(SCARD_IO_REQUEST *io_request) {
+VALUE _PCSC_IoRequest_lowlevel_new(const SCARD_IO_REQUEST *io_request) {
 	struct SCardIoRequestEx *request;
 	
 	VALUE rbIoRequest = Data_Make_Struct(cPcscIoRequest, struct SCardIoRequestEx, NULL, PCSC_IoRequest_free, request);

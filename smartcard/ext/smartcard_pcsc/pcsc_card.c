@@ -65,7 +65,7 @@ static VALUE PCSC_Card_initialize(VALUE self, VALUE rbContext, VALUE rbReaderNam
 	
 	card->pcsc_error = SCardConnect(context, RSTRING(rbFinalReaderName)->ptr, share_mode, preferred_protocols, &card->card_handle, &active_protocol);	
 	if(card->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardConnect: %s", pcsc_stringify_error(card->pcsc_error));
+		_PCSC_Exception_raise(card->pcsc_error, "SCardConnect");
 	else
 		card->released = 0;
 	return self;
@@ -95,7 +95,7 @@ static VALUE PCSC_Card_reconnect(VALUE self, VALUE rbShareMode, VALUE rbPreferre
 	
 	card->pcsc_error = SCardReconnect(card->card_handle, share_mode, preferred_protocols, initialization, &active_protocol);
 	if(card->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardReconnect: %s", pcsc_stringify_error(card->pcsc_error));
+		_PCSC_Exception_raise(card->pcsc_error, "SCardReconnect");		
 
 	return self;
 }
@@ -121,7 +121,7 @@ static VALUE PCSC_Card_disconnect(VALUE self, VALUE rbDisposition) {
 		card->pcsc_error = SCardDisconnect(card->card_handle, disposition);		
 		card->released = 1;
 		if(card->pcsc_error != SCARD_S_SUCCESS)
-			rb_raise(rb_eRuntimeError, "SCardDisconnect: %s", pcsc_stringify_error(card->pcsc_error));
+			_PCSC_Exception_raise(card->pcsc_error, "SCardDisconnect");		
 	}
 	return self;
 }
@@ -141,7 +141,7 @@ static VALUE PCSC_Card_begin_transaction(VALUE self) {
 	
 	card->pcsc_error = SCardBeginTransaction(card->card_handle);
 	if(card->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardBeginTransaction: %s", pcsc_stringify_error(card->pcsc_error));	
+		_PCSC_Exception_raise(card->pcsc_error, "SCardBeginTransaction");		
 	return self;
 }
 
@@ -164,7 +164,7 @@ static VALUE PCSC_Card_end_transaction(VALUE self, VALUE rbDisposition) {
 	disposition = NUM2UINT(rbDisposition);
 	card->pcsc_error = SCardEndTransaction(card->card_handle, disposition);
 	if(card->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardEndTransaction: %s", pcsc_stringify_error(card->pcsc_error));	
+		_PCSC_Exception_raise(card->pcsc_error, "SCardEndTransaction");		
 	return self;
 }
 
@@ -209,7 +209,7 @@ static VALUE PCSC_Card_get_attribute(VALUE self, VALUE rbAttributeId) {
 		}
 	}
 	if(card->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardGetAttrib: %s", pcsc_stringify_error(card->pcsc_error));	
+		_PCSC_Exception_raise(card->pcsc_error, "SCardGetAttrib");		
 #endif
 	return Qnil;
 }
@@ -248,7 +248,7 @@ static VALUE PCSC_Card_set_attribute(VALUE self, VALUE rbAttributeId, VALUE rbAt
 #else
 	card->pcsc_error = SCardSetAttrib(card->card_handle, attribute_id, (LPSTR)RSTRING(rbFinalAttributeValue)->ptr, RSTRING(rbFinalAttributeValue)->len);
 	if(card->pcsc_error != SCARD_S_SUCCESS)
-		rb_raise(rb_eRuntimeError, "SCardSetAttrib: %s", pcsc_stringify_error(card->pcsc_error));	
+		_PCSC_Exception_raise(card->pcsc_error, "SCardSetAttrib");		
 #endif
 	return self;
 }
@@ -306,7 +306,7 @@ static VALUE PCSC_Card_transmit(VALUE self, VALUE rbSendData, VALUE rbSendIoRequ
 			recv_io_request, (LPSTR)recv_buffer, &recv_length);	
 	if(card->pcsc_error != SCARD_S_SUCCESS) {
 		xfree(recv_buffer);
-		rb_raise(rb_eRuntimeError, "SCardTransmit: %s", pcsc_stringify_error(card->pcsc_error));
+		_PCSC_Exception_raise(card->pcsc_error, "SCardTransmit");		
 		return Qnil;
 	}
 
@@ -366,7 +366,7 @@ static VALUE PCSC_Card_control(VALUE self, VALUE rbControlCode, VALUE rbSendData
 #endif
 	if(card->pcsc_error != SCARD_S_SUCCESS) {
 		xfree(recv_buffer);
-		rb_raise(rb_eRuntimeError, "SCardControl: %s", pcsc_stringify_error(card->pcsc_error));
+		_PCSC_Exception_raise(card->pcsc_error, "SCardControl");		
 		return Qnil;
 	}
 
@@ -412,7 +412,7 @@ static VALUE PCSC_Card_status(VALUE self) {
 	card->pcsc_error = SCardStatus(card->card_handle, reader_names_buffer, &reader_names_length, &state, &protocol, (LPSTR)atr_buffer, &atr_length);
 	if(card->pcsc_error != SCARD_S_SUCCESS) {
 		xfree(reader_names_buffer); xfree(atr_buffer);
-		rb_raise(rb_eRuntimeError, "SCardStatus: %s", pcsc_stringify_error(card->pcsc_error));
+		_PCSC_Exception_raise(card->pcsc_error, "SCardStatus");		
 		return Qnil;
 	}
 	

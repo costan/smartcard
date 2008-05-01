@@ -68,15 +68,3 @@ int PCSC_Internal_ruby_strings_to_multistring(VALUE rbStrings, char **strings) {
 	
 	return 0;
 }
-
-#if defined(WIN32)
-char scard_error_buffer[128];
-
-/* Produces a string for an error code yielded by the SCard* PC/SC functions. Returns a static global buffer. */
-char *pcsc_stringify_error(DWORD scard_error) {
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, scard_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        scard_error_buffer, sizeof(scard_error_buffer), NULL );
-	return scard_error_buffer;
-}
-#endif

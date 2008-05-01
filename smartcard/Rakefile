@@ -15,10 +15,9 @@ Echoe.new('smartcard') do |p|
   p.rdoc_pattern = /^(lib|bin|tasks|ext)|^BUILD|^README|^CHANGELOG|^TODO|^LICENSE|^COPYING$/
   
   p.eval = proc do |p|
-    case RUBY_PLATFORM
-    when /mswin/
+    if Platform.windows?
       p.files += ['lib/smartcard/pcsc.so']
-      p.platform = Gem::Platform::WIN32
+      p.platform = Gem::Platform::CURRENT
 
       # take out the extension info from the gemspec
       task :postcompile_hacks => [:compile] do

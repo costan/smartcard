@@ -4,4 +4,8 @@
 	<pathentry path="org.rubypeople.rdt.launching.RUBY_CONTAINER" type="con"/>
 	<pathentry path="GEM_LIB/smartcard-0.2.2/lib" type="var"/>
 	<pathentry path="GEM_LIB/echoe-2.7.5/lib" type="var"/>
+	<pathentry path="GEM_LIB/echoe-2.7.11/lib" type="var"/>
+	<pathentry path="GEM_LIB/smartcard-0.2.3-x86-mswin32/lib" type="var"/>
+	<pathentry path="GEM_LIB/smartcard-0.2.3-x86-mswin32/lib" type="var"/>
+	<pathentry path="GEM_LIB/echoe-2.7.11/lib" type="var"/>
 </loadpath>
