@@ -30,12 +30,9 @@ extension code in +smartcard+ has a few hacks to work around that (look for the
 <tt>RB_SMARTCARD_OSX_TIGER_HACK</tt> define. The following commands are broken /
 don't work:
 * Smartcard::PCSC::Context#is_valid (always returs +true+)
-* Smartcard::PCSC::Card#get_attribute (throws exception because it's not
-implemented)
-* Smartcard::PCSC::Card#set_attribute (throws exception because it's not
-implemented)
-* Smartcard::PCSC::Card#control (Tiger's API is broken, so the call will
-probably not work)
+* Smartcard::PCSC::Card#get_attribute (not implemented, throws exception)
+* Smartcard::PCSC::Card#set_attribute (not implemented, throws exception)
+* Smartcard::PCSC::Card#control (Tiger's API is broken, the call may not work)
 
 The developer team doesn't support or test against ports of +gcc+ or +pcsclite+,
 but we success notifications are welcome.
