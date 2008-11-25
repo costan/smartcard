@@ -1,32 +1,37 @@
-+smartcard+ aims to become the standard support library for smart-card development on ruby.
-Right now, the project offers a PC/SC binding that is working on ruby 1.8, under
-Linux, OSX, and Windows. Future plans include a high level abstraction for the PC/SC binding 
-(plus any other bindings people need), and an interface for Java cards.
++smartcard+ aims to become the standard support library for smart-card
+development on ruby. Right now, the project offers a PC/SC binding that is
+working on ruby 1.8, under Linux, OSX, and Windows. Future plans include a high
+level abstraction for the PC/SC binding  (plus any other bindings people need),
+and an interface for Java cards.
 
 = Installation
 
 	gem install smartcard
 Windows:: Select the <tt>win32</tt> gem.
 OSX:: Install the Developer Tools to get +gcc+. Requires Tiger or Leopard.
-UNIX:: You need a PC/SC provider. See the {BUILD file}[link://files/BUILD.html] for details. The file also contains package lists for popular distributions.
+UNIX:: You need a PC/SC provider. See the {BUILD file}[link://files/BUILD.html]
+for details. The file also contains package lists for popular distributions.
 
 = Documentation
 
-The documentation you see was generated with RDoc. If you install the +smartcard+ gem, you should be
-able to use ri to see the documentation. If you're using the SVN version, you can <tt>rake doc</tt> to build
-the HTML documentation yourself.
+The documentation you see was generated with RDoc. If you install the
++smartcard+ gem, you should be able to use ri to see the documentation. If
+you're using the SVN version, you can <tt>rake doc</tt> to build the HTML
+documentation yourself.
 
 = License
 
-+smartcard+ is released under the MIT license. This means you're free to do whatever you want
-with it. However, it'd be nice to let the developers know if you plan to include this in a
-distribution (bragging rights are always good). The {LICENSE file}[link://files/LICENSE.html]
-has the license in legalese.
++smartcard+ is released under the MIT license. This means you're free to do
+whatever you want with it. However, it'd be nice to let the developers know if
+you plan to include this in a distribution (bragging rights are always good).
+The {LICENSE file}[link://files/LICENSE.html] has the license in legalese.
 
 = Acknowledgements
 
-+smartcard+ is developed by Victor Costan while working as a Research Assistant for MIT, under
-{Prof. Srini Devadas}[http://people.csail.mit.edu/devadas/], in the
-{Trusted Computing group}[http://projects.csail.mit.edu/tc/].
-The work is funded by a grant from {Quanta Computer Inc}[http://www.quanta.com.tw], under the
++smartcard+ is developed by Victor Costan while working as a Research Assistant
+for MIT, under {Prof. Srini Devadas}[http://people.csail.mit.edu/devadas/], in
+the {Trusted Computing group}[http://projects.csail.mit.edu/tc/].
+
+The work is funded by a grant from
+{Quanta Computer Inc}[http://www.quanta.com.tw], under the
 {T-Party Project}[http://projects.csail.mit.edu/tparty/].
