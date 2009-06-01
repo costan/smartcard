@@ -83,7 +83,7 @@ static int _validate_readerstates_args(VALUE rbReaderStates, VALUE rbIndex, stru
  * the reader state equals this value. 
  * 
  * The returned state is a bitfield; the bits are defined in the
- * Smartcard::PCSC::STATUS_ constants. See Smartcard::PCSC::STATUS_UNKNOWN.
+ * Smartcard::PCSC::STATE_ constants. See Smartcard::PCSC::STATE_UNAWARE.
  * 
  * +index+:: the 0-based index of the reader state element to be queried
  */
@@ -106,7 +106,7 @@ static VALUE PCSC_ReaderStates_current_state_of(VALUE self, VALUE rbIndex) {
  * reader state in this value.
  * 
  * The returned state is a bitfield; the bits are defined in the
- * Smartcard::PCSC::STATUS_ constants. See Smartcard::PCSC::STATUS_UNKNOWN.
+ * Smartcard::PCSC::STATE_ constants. See Smartcard::PCSC::STATE_UNAWARE.
  * 
  * +index+:: the 0-based index of the reader state element to be queried
  */
