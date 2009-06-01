@@ -38,7 +38,8 @@ static VALUE PCSC_ReaderStates_alloc(VALUE klass) {
  *      new(num_states) --> reader_states
  * 
  * Creates an array of +num_states+ reader state elements.
- * The states are unusable until they are assigned reader names by calling ReaderStates#set_reader_name_of.
+ * The states are unusable until they are assigned reader names by calling
+ * Smartcard::PCSC::ReaderStates#set_reader_name_of.
  */
 static VALUE PCSC_ReaderStates_initialize(VALUE self, VALUE rbNumStates) {
 	struct PCSCReaderStates *states;	
@@ -77,10 +78,12 @@ static int _validate_readerstates_args(VALUE rbReaderStates, VALUE rbIndex, stru
  * call-seq:
  *      current_state_of(index) --> current_state
  * 
- * The current state (_dwCurrentState_ in PC/SC) in the <tt>index</tt>th reader state element.
- * Smartcard::PCSC::Context#get_status_change blocks as long as the reader state equals this value. 
+ * The current state (_dwCurrentState_ in PC/SC) in the <tt>index</tt>th reader
+ * state element. Smartcard::PCSC::Context#get_status_change blocks as long as
+ * the reader state equals this value. 
  * 
- * The returned state is a bitfield; the bits are defined in the Smartcard::PCSC::STATE_ constants. 
+ * The returned state is a bitfield; the bits are defined in the
+ * Smartcard::PCSC::STATUS_ constants. See Smartcard::PCSC::STATUS_UNKNOWN.
  * 
  * +index+:: the 0-based index of the reader state element to be queried
  */
@@ -98,10 +101,12 @@ static VALUE PCSC_ReaderStates_current_state_of(VALUE self, VALUE rbIndex) {
  * call-seq:
  *      event_state_of(index) --> event_state
  * 
- * The event state (_dwEventState_ in PC/SC) in the <tt>index</tt>th reader state element.
- * Smartcard::PCSC::Context#get_status_change stores the updated reader state in this value. 
+ * The event state (_dwEventState_ in PC/SC) in the <tt>index</tt>th reader
+ * state element. Smartcard::PCSC::Context#get_status_change stores the updated
+ * reader state in this value.
  * 
- * The returned state is a bitfield; the bits are defined in the Smartcard::PCSC::STATE_ constants. 
+ * The returned state is a bitfield; the bits are defined in the
+ * Smartcard::PCSC::STATUS_ constants. See Smartcard::PCSC::STATUS_UNKNOWN.
  * 
  * +index+:: the 0-based index of the reader state element to be queried
  */

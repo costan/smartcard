@@ -10,7 +10,8 @@ Echoe.new('smartcard') do |p|
   p.summary = 'Interface with ISO 7816 smart cards.'
   p.url = 'http://www.costan.us/smartcard'
   
-  p.need_tar_gz = false
+  p.need_tar_gz = !Platform.windows?
+  p.need_zip = !Platform.windows?
   p.clean_pattern += ['ext/**/*.manifest', 'ext/**/*_autogen.h']
   p.rdoc_pattern = /^(lib|bin|tasks|ext)|^BUILD|^README|^CHANGELOG|^TODO|^LICENSE|^COPYING$/
   

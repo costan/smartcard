@@ -1,3 +1,5 @@
+v0.3.2. Fixed documentation for ReaderStates class.
+
 v0.3.1. Fixed documentation for the new PcscException class.
 
 v0.3.0. Added PcscException class used to wrap PC/SC exceptions.
