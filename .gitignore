@@ -1,10 +1,9 @@
-ext/**/*.o
-ext/smartcard_pcsc/Makefile
-ext/smartcard_pcsc/mkmf.log
-ext/smartcard_pcsc/pcsc.bundle
-ext/smartcard_pcsc/pcsc.so
-ext/smartcard_pcsc/pcsc_autogen.h
-lib/smartcard/pcsc.bundle
-lib/smartcard/pcsc.so
+**/*.o
+**/*.obj
+**/Makefile
+**/mkmf.log
+**/*.bundle
+**/*.so
+**/*_autogen.*
 pkg
 .loadpath
