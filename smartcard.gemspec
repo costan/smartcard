@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{smartcard}
-  s.version = "0.4.0"
+  s.version = "0.4.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Victor Costan"]
-  s.date = %q{2009-08-18}
+  s.date = %q{2009-08-19}
   s.description = %q{Interface with ISO 7816 smart cards.}
   s.email = %q{victor@costan.us}
   s.extensions = ["ext/smartcard_pcsc/extconf.rb"]
