@@ -1,7 +1,11 @@
 .loadpath
+*.bundle
+*.def
+*.exp
+*.lib
 *.o
 *.obj
-*.bundle
+*.pdb
 *.so
 *_autogen.*
 Makefile
