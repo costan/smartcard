@@ -1,9 +1,9 @@
-*/*.o
-*/*.obj
-*/Makefile
-*/mkmf.log
-*/*.bundle
-*/*.so
-*/*_autogen.*
-pkg
 .loadpath
+*.o
+*.obj
+*.bundle
+*.so
+*_autogen.*
+Makefile
+mkmf.log
+pkg
