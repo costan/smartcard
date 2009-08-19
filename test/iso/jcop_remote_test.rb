@@ -48,7 +48,7 @@ class JcopRemoteTest < Test::Unit::TestCase
     @server.stop
   end
 
-  def test_apdu_exchange
+  def _test_apdu_exchange
     apdu_request = [0x31, 0x41, 0x59, 0x26, 0x53]
     apdu_response = [0x27, 0x90, 0x00]
     
@@ -69,8 +69,25 @@ class JcopRemoteTest < Test::Unit::TestCase
     Kernel.sleep 0.05  # Wait for the server to process the disconnect.
     assert_equal [:start, apdu_request, :end], logic.received
   end
+
+  def test_apdu_exchange
+    _test_apdu_exchange
+  end
   
-  def test_java_card_integration
+  def test_apud_exchange_with_broken_server
+    # Test broken server which re-sends the ATR before any good message.
+    class << @server
+      def send_message(socket, message)
+        if message[:type] == 1
+          super socket, :type => 0, :node => 0, :data => (61..68).to_a
+        end
+        super socket, message
+      end
+    end
+    _test_apdu_exchange
+  end
+  
+  def test_iso_card_integration
     apdu_request = [0x00, 0x31, 0x41, 0x59, 0x00]
     apdu_response = [0x27, 0x90, 0x00]
 

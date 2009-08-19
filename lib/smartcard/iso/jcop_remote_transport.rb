@@ -28,7 +28,10 @@ class JcopRemoteTransport
   # 
   def exchange_apdu(apdu)
     send_message @socket, :type => 1, :node => 0, :data => apdu
-    recv_message(@socket)[:data]
+    loop do
+      message = recv_message @socket
+      return message[:data] if message[:type] == 1
+    end
   end  
 
   # Makes a transport-level connection to the TEM.
