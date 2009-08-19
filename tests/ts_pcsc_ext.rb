@@ -1,3 +1,7 @@
+# Author:: Victor Costan
+# Copyright:: Copyright (C) 2008 Massachusetts Institute of Technology
+# License:: MIT
+
 require 'smartcard'
 require 'pp'
 

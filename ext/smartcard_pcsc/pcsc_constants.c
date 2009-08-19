@@ -119,7 +119,7 @@ void Init_PCSC_Consts() {
 #endif /* SCARD_STATE_UNPOWERED */
 	
 	/* INFINITE : Infinite timeout. */
-	rb_define_const(mPcsc, "INFINITE_TIMEOUT", INT2NUM(INFINITE));
+	rb_define_const(mPcsc, "INFINITE_TIMEOUT", UINT2NUM(INFINITE));
 	
 	
 	/* SCARD_UNKNOWNU : Card is absent. */

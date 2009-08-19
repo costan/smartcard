@@ -225,7 +225,7 @@ static VALUE PCSC_Context_get_status_change(VALUE self, VALUE rbReaderStates, VA
 	if(TYPE(rbTimeout) == T_NIL || TYPE(rbTimeout) == T_FALSE)
 		timeout = INFINITE;
 	else
-		timeout = NUM2INT(rbTimeout);
+		timeout = NUM2UINT(rbTimeout);
 	
 	if(_PCSC_ReaderStates_lowlevel_get(rbReaderStates, &reader_states, &reader_states_count) == 0)
 		rb_raise(rb_eArgError, "first parameter is not a ReaderStates instance or nil");
