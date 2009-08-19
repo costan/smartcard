@@ -28,9 +28,10 @@ Manifest
 Rakefile
 README
 smartcard.gemspec
-test/iso/test_auto_configurator.rb
-test/iso/test_iso_card_mixin.rb
-test/iso/test_jcop_remote.rb
-test/pcsc/test_containers.rb
-test/pcsc/test_smoke.rb
+test/gp/gp_card_mixin_test.rb
+test/iso/auto_configurator_test.rb
+test/iso/iso_card_mixin_test.rb
+test/iso/jcop_remote_test.rb
+test/pcsc/containers_test.rb
+test/pcsc/smoke_test.rb
 tests/ts_pcsc_ext.rb
