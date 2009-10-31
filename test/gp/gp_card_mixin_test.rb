@@ -30,4 +30,12 @@ class GpCardMixinTest < Test::Unit::TestCase
                    and_return([0x90, 0x00])
     mock.select_application([0x19, 0x83, 0x12, 0x29, 0x10])
   end
+  
+  def test_gp_applications
+    t = Smartcard::Iso::AutoConfigurator.auto_transport
+    class <<t
+      include GpCardMixin
+    end
+    t.applications
+  end
 end

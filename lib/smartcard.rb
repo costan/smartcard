@@ -12,4 +12,5 @@ require 'smartcard/iso/transport.rb'
 require 'smartcard/iso/auto_configurator.rb'
 
 
+require 'smartcard/gp/asn1_ber.rb'
 require 'smartcard/gp/gp_card_mixin.rb'

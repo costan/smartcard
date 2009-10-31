@@ -28,7 +28,8 @@ module IsoCardMixin
   def iso_apdu!(apdu_data)
     response = self.iso_apdu apdu_data
     return response[:data] if response[:status] == 0x9000
-    raise "JavaCard response has error status 0x#{'%04x' % response[:status]}"
+    raise "JavaCard response has error status 0x#{'%04x' % response[:status]}" +
+          " - #{response[:data].map { |ch| '%02x' % ch }.join(' ')}"
   end
 
   # Performs an APDU exchange with the ISO7816 card.

@@ -10,13 +10,13 @@ Echoe.new('smartcard') do |p|
   p.summary = 'Interface with ISO 7816 smart cards.'
   p.url = 'http://www.costan.us/smartcard'
   
-  p.need_tar_gz = !Platform.windows?
-  p.need_zip = !Platform.windows?
+  p.need_tar_gz = !Gem.win_platform?
+  p.need_zip = !Gem.win_platform?
   p.clean_pattern += ['ext/**/*.manifest', 'ext/**/*_autogen.h']
   p.rdoc_pattern = /^(lib|bin|tasks|ext)|^BUILD|^README|^CHANGELOG|^TODO|^LICENSE|^COPYING$/
   
   p.eval = proc do |p|
-    if Platform.windows?
+    if Gem.win_platform?
       p.files += ['lib/smartcard/pcsc.so']
       p.platform = Gem::Platform::CURRENT
 
