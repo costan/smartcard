@@ -91,7 +91,7 @@ class JcopRemoteTest < Test::Unit::TestCase
   end
   
   def test_iso_card_integration
-    apdu_request = [0x00, 0x31, 0x41, 0x59, 0x00]
+    apdu_request = [0x00, 0x31, 0x41, 0x59, 0x00, 0x00]
     apdu_response = [0x27, 0x90, 0x00]
 
     logic = Logic.new([apdu_response])
