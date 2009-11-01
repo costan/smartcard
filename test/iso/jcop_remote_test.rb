@@ -34,6 +34,9 @@ class JcopRemoteTest < Test::Unit::TestCase
       @received << apdu
       @responses.shift
     end
+    def card_atr
+      [0x31, 0x41, 0x59].pack('C*')
+    end
   end
   
   def setup

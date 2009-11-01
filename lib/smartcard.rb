@@ -13,4 +13,6 @@ require 'smartcard/iso/auto_configurator.rb'
 
 
 require 'smartcard/gp/asn1_ber.rb'
+require 'smartcard/gp/cap_loader.rb'
+require 'smartcard/gp/des.rb'
 require 'smartcard/gp/gp_card_mixin.rb'

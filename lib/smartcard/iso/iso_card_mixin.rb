@@ -28,8 +28,16 @@ module IsoCardMixin
   def iso_apdu!(apdu_data)
     response = self.iso_apdu apdu_data
     return response[:data] if response[:status] == 0x9000
+    IsoCardMixin.raise_response_exception response
+  end
+  
+  # Raises an exception in response to an error status in an APDU.
+  #
+  # :call_seq:
+  #   IsoCardMixin.raise_response_exception(response)
+  def self.raise_response_exception(response)
     raise "JavaCard response has error status 0x#{'%04x' % response[:status]}" +
-          " - #{response[:data].map { |ch| '%02x' % ch }.join(' ')}"
+          " - #{response[:data].map { |ch| '%02x' % ch }.join(' ')}"    
   end
 
   # Performs an APDU exchange with the ISO7816 card.
@@ -48,7 +56,7 @@ module IsoCardMixin
   # Serializes an APDU for wire transmission.
   #
   # :call-seq:
-  #   transport.wire_apdu(apdu_data) -> array
+  #   IsoCardMixin.serialize_apdu(apdu_data) -> array
   #
   # The following keys are recognized in the APDU hash:
   #   cla:: the CLA byte in the APDU (optional, defaults to 0) 
@@ -74,13 +82,14 @@ module IsoCardMixin
     else
       apdu << 0
     end
+    apdu << (apdu_data[:le] || 0)
     apdu
   end
   
   # De-serializes a ISO7816 response APDU.
   # 
   # :call-seq:
-  #   transport.deserialize_response(response) -> hash
+  #   IsoCardMixin.deserialize_response(response) -> hash
   #
   # The response contains the following keys:
   #   status:: the 2-byte status code (e.g. 0x9000 is OK)

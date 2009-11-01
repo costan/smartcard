@@ -18,13 +18,18 @@ class PcscTransport
   def initialize(options)
     @options = options
     @context = nil
-    @card = nil
+    @card = nil    
+    @atr = nil
   end
 
   def exchange_apdu(apdu)
     xmit_apdu_string = apdu.pack('C*')
     result_string = @card.transmit xmit_apdu_string, @xmit_ioreq, @recv_ioreq
     return result_string.unpack('C*')
+  end
+  
+  def card_atr
+    @atr
   end
   
   def connect
@@ -62,6 +67,7 @@ class PcscTransport
     # build the transmit / receive IoRequests
     status = @card.status
     @xmit_ioreq = @@xmit_iorequest[status[:protocol]]
+    @atr = status[:atr]
     if RUBY_PLATFORM =~ /win/ and (not RUBY_PLATFORM =~ /darwin/)
       @recv_ioreq = nil
     else
@@ -73,6 +79,7 @@ class PcscTransport
     unless @card.nil?
       @card.disconnect PCSC::DISPOSITION_LEAVE
       @card = nil
+      @atr = nil
     end
     unless @context.nil?
       @context.release

@@ -42,6 +42,13 @@ module JcopRemoteServingStubs
     # Dumb implementation that always returns OK.
     [0x90, 0x00]
   end
+  
+  # The smartcard's APDU.
+  def card_apdu
+    # ATR from the card simulator in JCOP 3.2.7.
+    [0x3B, 0xF8, 0x13, 0x00, 0x00, 0x81, 0x31, 0xFE, 0x45, 0x4A, 0x43, 0x4F,
+     0x50, 0x76, 0x32, 0x34, 0x31, 0xB7].pack('C*')
+  end
 end  # module JcopRemoteServingStubs
     
 
@@ -161,15 +168,17 @@ class JcopRemoteServer
     
     case request[:type]
     when 0
-      # Wait for card; no-op, because that should have happen when the client
-      # connected.
-      send_message socket, :type => 0, :node => 0, :data => [3, 1, 4, 1, 5, 9]
+      # Wait for card (no-op, happened when the client connected) and return
+      # card ATR.
+      send_message socket, :type => 0, :node => 0,
+                           :data => @logic.card_atr.unpack('C*')
     when 1
-      # ATR exchange; the class' bread and butter
+      # APDU exchange; the class' bread and butter
       response = @logic.exchange_apdu request[:data]
       send_message socket, :type => 1, :node => 0, :data => response
     else
-      send_message socket, :type => request[:type], :node => 0, :data => []
+      send_message socket, :type => request[:type], :node => 0,
+                           :data => @logic.card_atr.unpack('C*')
     end
   end
   private :process_request    
