@@ -58,7 +58,7 @@ class JcopRemoteTransport
       # Wait for the card to be inserted.
       send_message @socket, :type => 0, :node => 0, :data => [0, 1, 0, 0]
       message = recv_message @socket
-      @atr = message[:data]
+      @atr = message[:data].pack('C*')
     rescue Exception
       @socket = nil
       raise

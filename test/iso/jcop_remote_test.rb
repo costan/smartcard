@@ -68,7 +68,7 @@ class JcopRemoteTest < Test::Unit::TestCase
     Kernel.sleep 0.05  # Wait for the server to start up.
     @client.connect
     assert_equal apdu_response, @client.exchange_apdu(apdu_request)
-    assert_equal [0x31, 0x41, 0x59], @client.card_atr
+    assert_equal "\x31\x41\x59", @client.card_atr
     @client.disconnect
     Kernel.sleep 0.05  # Wait for the server to process the disconnect.
     assert_equal [:start, apdu_request, :end], logic.received
