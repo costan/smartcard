@@ -23,16 +23,22 @@ class JcopRemoteTransport
   def initialize(options)
     @host, @port = options[:host], options[:port]
     @socket = nil
+    @atr = nil
   end
   
-  # 
+  # :nodoc: standard transport method
   def exchange_apdu(apdu)
     send_message @socket, :type => 1, :node => 0, :data => apdu
     loop do
       message = recv_message @socket
       return message[:data] if message[:type] == 1
     end
-  end  
+  end
+  
+  # :nodoc: standard transport method
+  def card_atr
+    @atr
+  end
 
   # Makes a transport-level connection to the TEM.
   def connect
@@ -51,7 +57,8 @@ class JcopRemoteTransport
       
       # Wait for the card to be inserted.
       send_message @socket, :type => 0, :node => 0, :data => [0, 1, 0, 0]
-      recv_message @socket  # ATR should come here, but who cares      
+      message = recv_message @socket
+      @atr = message[:data]
     rescue Exception
       @socket = nil
       raise
@@ -63,6 +70,7 @@ class JcopRemoteTransport
     if @socket
       @socket.close
       @socket = nil
+      @atr = nil
     end
   end
   

@@ -1,3 +1,5 @@
+v0.4.4. Bugfixes in JcopRemoteTransport's ATR forwarding logic.
+
 v0.4.3. Fixed gem manifest to state dependency on rubyzip.
 
 v0.4.2. GlobalPlatform applet instalation.
