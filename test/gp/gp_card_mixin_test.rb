@@ -209,8 +209,7 @@ class GpCardMixinTest < Test::Unit::TestCase
     # Install applet.
     applet_aid = [0x19, 0x83, 0x12, 0x29, 0x10, 0xDE, 0xAD]
     cap_file = File.join File.dirname(__FILE__), 'hello.cap'
-    transport.install_applet cap_file,
-        [0x19, 0x83, 0x12, 0x29, 0x10, 0xDE, 0xAE]
+    transport.install_applet cap_file
 
     # Ensure applet works.
     transport.select_application applet_aid

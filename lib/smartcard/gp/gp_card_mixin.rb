@@ -363,13 +363,16 @@ module GpCardMixin
   #
   # Args:
   #   cap_file:: path to the applet's CAP file
-  #   package_aid:: the applet's package AID
+  #   package_aid:: the applet's package AID; if nil, the AID in the CAP's
+  #                 header is used (should work all the time)
   #   applet_aid:: the AID used to select the applet; if nil, the first AID
   #                in the CAP's Applet section is used (this works pretty well)
   #   install_data:: data to be passed to the applet at installation time
-  def install_applet(cap_file, package_aid, applet_aid = nil, install_data = [])
+  def install_applet(cap_file, applet_aid = nil, package_aid = nil,
+                     install_data = [])
     load_data = CapLoader.cap_load_data(cap_file)
     applet_aid ||= load_data[:applets].first[:aid]
+    package_aid ||= load_data[:header][:package][:aid]
 
     delete_application applet_aid
     
