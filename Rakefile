@@ -9,11 +9,13 @@ Echoe.new('smartcard') do |p|
   p.email = 'victor@costan.us'
   p.summary = 'Interface with ISO 7816 smart cards.'
   p.url = 'http://www.costan.us/smartcard'
+  p.dependencies = ['rubyzip >=0.9.1']
   
   p.need_tar_gz = !Gem.win_platform?
   p.need_zip = !Gem.win_platform?
   p.clean_pattern += ['ext/**/*.manifest', 'ext/**/*_autogen.h']
-  p.rdoc_pattern = /^(lib|bin|tasks|ext)|^BUILD|^README|^CHANGELOG|^TODO|^LICENSE|^COPYING$/
+  p.rdoc_pattern =
+      /^(lib|bin|tasks|ext)|^BUILD|^README|^CHANGELOG|^TODO|^LICENSE|^COPYING$/
   
   p.eval = proc do |p|
     if Gem.win_platform?

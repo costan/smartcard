@@ -1,3 +1,5 @@
+v0.4.3. Fixed gem manifest to state dependency on rubyzip.
+
 v0.4.2. GlobalPlatform applet instalation.
 
 v0.4.1. Workaround ATR resend bug in JCOP simulator 3.2.7.
