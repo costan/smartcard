@@ -22,8 +22,8 @@ anything.
 
 You need to install the Developer Tools to get gcc.
 
-Leopard (OSX 10.5) includes a working PC/SC provider, as well as a good driver
-for CCID readers.
+Leopard and Snow Leopard (OSX 10.5 / 10.6) include a working PC/SC provider, as
+well as a good driver for CCID readers.
 
 Tiger's (OSX 10.4) PC/SC implementation is broken and incomplete, so the Ruby
 extension code in +smartcard+ has a few hacks to work around that (look for the
@@ -35,13 +35,13 @@ don't work:
 * Smartcard::PCSC::Card#control (Tiger's API is broken, the call may not work)
 
 The developer team doesn't support or test against ports of +gcc+ or +pcsclite+,
-but we success notifications are welcome.
+but we welcome patches or success stories.
 
 == Windows
 
 A lot of effort has been spent to make Windows builds as easy as possible.
 +smartcard+ is currently built using a full edition of
-{Visual Studio 2005}[http://msdn.microsoft.com/vstudio/], but all sources
+{Visual Studio 6.0}[http://msdn.microsoft.com/vstudio/], but all sources
 indicate that
 {Visual C++ Express 2005}[http://www.microsoft.com/express/download/]
 works, as long as you also install a Windows SDK (you're on your own for that).
@@ -69,7 +69,7 @@ readers.
 === Ubuntu
 
 Installing the following packages (and their dependencies) gets you going on
-Ubuntu (tested on 7.10, 8.04, and 8.10):
+Ubuntu (tested on 8.04, 8.10, 9.04 and 9.10):
 * build-essential
 * libccid
 * libpcsclite-dev (depends on libpcsclite or libpcsclite1)
