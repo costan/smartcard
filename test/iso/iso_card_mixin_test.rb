@@ -89,8 +89,15 @@ class IsoCardMixinTest < Test::Unit::TestCase
   
   def test_iso_apdu_bang
     assert_equal [0x67, 0x31], win_mock.iso_apdu!(win_apdu)
-    assert_raise(RuntimeError) do
+    assert_raise(Smartcard::Iso::ApduError) do
       lose_mock.iso_apdu!(lose_apdu)
+    end
+    
+    begin
+      lose_mock.iso_apdu! lose_apdu
+    rescue Smartcard::Iso::ApduError => e
+      assert_equal [], e.data, 'APDU data in raised error'
+      assert_equal 0x8631, e.status, 'APDU error status in raised error'
     end
   end
 end

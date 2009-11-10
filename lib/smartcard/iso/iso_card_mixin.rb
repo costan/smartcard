@@ -16,7 +16,7 @@ module Smartcard::Iso
 # the APDU data as an array of integers between 0 and 255, and expects a
 # response in the same format.
 module IsoCardMixin  
-  # APDU exchange with the ISO7816 card, raising an exception if the return
+  # APDU exchange with the ISO7816 card, raising an ApduError if the return
   # code is not success (0x9000).
   #
   # :call_seq:
@@ -24,22 +24,13 @@ module IsoCardMixin
   #
   # The apdu_data should be in the format expected by
   # IsoCardMixin#serialize_apdu. Returns the response data, if the response
-  # status indicates success (0x9000). Otherwise, raises an exeception.
+  # status indicates success (0x9000). Otherwise, raises an ApduError.
   def iso_apdu!(apdu_data)
     response = self.iso_apdu apdu_data
     return response[:data] if response[:status] == 0x9000
-    IsoCardMixin.raise_response_exception response
+    raise ApduError, response
   end
   
-  # Raises an exception in response to an error status in an APDU.
-  #
-  # :call_seq:
-  #   IsoCardMixin.raise_response_exception(response)
-  def self.raise_response_exception(response)
-    raise "JavaCard response has error status 0x#{'%04x' % response[:status]}" +
-          " - #{response[:data].map { |ch| '%02x' % ch }.join(' ')}"    
-  end
-
   # Performs an APDU exchange with the ISO7816 card.
   #
   # :call-seq:

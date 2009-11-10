@@ -22,6 +22,7 @@ lib/smartcard/gp/asn1_ber.rb
 lib/smartcard/gp/cap_loader.rb
 lib/smartcard/gp/des.rb
 lib/smartcard/gp/gp_card_mixin.rb
+lib/smartcard/iso/apdu_error.rb
 lib/smartcard/iso/auto_configurator.rb
 lib/smartcard/iso/iso_card_mixin.rb
 lib/smartcard/iso/jcop_remote_protocol.rb
@@ -30,6 +31,7 @@ lib/smartcard/iso/jcop_remote_transport.rb
 lib/smartcard/iso/pcsc_transport.rb
 lib/smartcard/iso/transport.rb
 lib/smartcard/pcsc/pcsc_exception.rb
+smartcard.gemspec
 test/gp/asn1_ber_test.rb
 test/gp/cap_loader_test.rb
 test/gp/des_test.rb
@@ -38,6 +40,7 @@ test/gp/hello.apdu
 test/gp/hello.cap
 test/iso/auto_configurator_test.rb
 test/iso/iso_card_mixin_test.rb
+test/iso/iso_exception_test.rb
 test/iso/jcop_remote_test.rb
 test/pcsc/containers_test.rb
 test/pcsc/smoke_test.rb

@@ -2,6 +2,7 @@ require 'smartcard/pcsc'
 require 'smartcard/pcsc/pcsc_exception.rb'
 
 
+require 'smartcard/iso/apdu_error.rb'
 require 'smartcard/iso/iso_card_mixin.rb'
 require 'smartcard/iso/jcop_remote_protocol.rb'
 require 'smartcard/iso/jcop_remote_transport.rb'

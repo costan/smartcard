@@ -179,7 +179,7 @@ module GpCardMixin
       raw = iso_apdu :cla => 0x80, :ins => 0xF2, :p1 => scope_byte,
                      :p2 => (first ? 0 : 1), :data => [0x4F, 0x00]
       if raw[:status] != 0x9000 && raw[:status] != 0x6310 
-        Smartcard::Iso::IsoCardMixin.raise_response_exception raw
+        raise Smartcard::Iso::ApduException, raw
       end
       
       offset = 0
