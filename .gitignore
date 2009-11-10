@@ -9,5 +9,6 @@
 *.so
 *_autogen.*
 Makefile
+doc
 mkmf.log
 pkg
