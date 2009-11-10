@@ -1,3 +1,5 @@
+v0.4.8. Gem dependencies.
+
 v0.4.7. Custom exception class for APDU responses with error codes.
 
 v0.4.6. Automatic detection of package AID from CAP in install_applet.

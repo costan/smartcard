@@ -10,6 +10,8 @@ Echoe.new('smartcard') do |p|
   p.summary = 'Interface with ISO 7816 smart cards.'
   p.url = 'http://www.costan.us/smartcard'
   p.dependencies = ['rubyzip >=0.9.1']
+  p.development_dependencies = ['echoe >=3.2',
+                                'flexmock >=0.8.6']
   
   p.need_tar_gz = !Gem.win_platform?
   p.need_zip = !Gem.win_platform?
