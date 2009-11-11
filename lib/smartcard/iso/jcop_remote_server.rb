@@ -132,7 +132,7 @@ class JcopRemoteServer
   # Creates a socket listening to incoming connections to this server.
   # 
   # :call-seq:
-  #   server.establish_socket(options) -> Socket
+  #   server.serving_socket(options) -> Socket
   #
   # The |options| parameter supports the same keys as the options parameter
   # of JcopRemoteServer#new.
