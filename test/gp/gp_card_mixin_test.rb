@@ -30,6 +30,20 @@ class GpCardMixinTest < Test::Unit::TestCase
     @max_apdu_length = 0x0F
   end
 
+  def mock_card_manager_query(channel_mock)
+    flexmock(channel_mock).should_receive(:exchange_apdu).
+        with([0x00, 0xA4, 0x04, 0x00, 0x00, 0x00]).
+        and_return([0x6F, 16, 0x84, 8, 0xA0, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00,
+                    0x00, 0xA5, 4, 0x9F, 0x65, 1, 0x0F, 0x90, 0x00])    
+  end
+  
+  def test_gp_card_manager_aid
+    mock = MixinWrapper.new
+    mock_card_manager_query mock
+    golden = [0xA0, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00]
+    assert_equal golden, mock.gp_card_manager_aid
+  end
+  
   def mock_card_manager_select(channel_mock)
     flexmock(channel_mock).should_receive(:exchange_apdu).
         with([0x00, 0xA4, 0x04, 0x00, 0x08, 0xA0, 0x00, 0x00, 0x00, 0x03, 0x00,
@@ -40,13 +54,14 @@ class GpCardMixinTest < Test::Unit::TestCase
     
   def test_select_application
     mock = MixinWrapper.new
+    mock_card_manager_query mock
     mock_card_manager_select mock
     app_data = mock.select_application mock.gp_card_manager_aid
 
     golden = { :aid => mock.gp_card_manager_aid, :max_apdu_length => 0x0F }
     assert_equal golden, app_data
   end
-  
+    
   def mock_channel_setup(channel_mock)
     flexmock(channel_mock).should_receive(:exchange_apdu).
        with([0x80, 0x50, 0x00, 0x00, 0x08, 0x20, 0xBB, 0xE0, 0x4A, 0x1C, 0x6B,
@@ -129,6 +144,7 @@ class GpCardMixinTest < Test::Unit::TestCase
   
   def test_gp_applications
     mock = MixinWrapper.new
+    mock_card_manager_query mock
     mock_card_manager_select mock
     mock_channel_setup mock
     mock_channel_lock mock
@@ -156,6 +172,7 @@ class GpCardMixinTest < Test::Unit::TestCase
   
   def test_delete_application
     mock = MixinWrapper.new
+    mock_card_manager_query mock
     mock_card_manager_select mock
     mock_channel_setup mock
     mock_channel_lock mock
@@ -167,6 +184,7 @@ class GpCardMixinTest < Test::Unit::TestCase
   
   def test_gp_install_load
     mock = MixinWrapper.new
+    mock_card_manager_query mock    
     flexmock(mock).should_receive(:exchange_apdu).
        with([0x80, 0xE6, 0x02, 0x00, 0x14, 0x07, 0x19, 0x83, 0x12, 0x29, 0x10,
              0xFA, 0xCE, 0x08, 0xA0, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,

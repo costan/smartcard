@@ -1,3 +1,5 @@
+v0.4.10. Removed hardcoded card manager AID.
+
 v0.4.9. Disabled Nagle's algorithm in the remote JCOP transport.
 
 v0.4.8. Gem dependencies.

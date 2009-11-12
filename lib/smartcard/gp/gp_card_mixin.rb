@@ -35,9 +35,12 @@ module GpCardMixin
     app_data
   end
   
-  # The default application ID of the GlobalPlatform card manager. 
+  # The application ID of the GlobalPlatform card manager. 
   def gp_card_manager_aid
-    [0xA0, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00]
+    unless instance_variable_defined? :@gp_card_manager_aid
+      @gp_card_manager_aid = select_application([])[:aid]
+    end
+    @gp_card_manager_aid
   end
   
   # Issues a GlobalPlatform INITIALIZE UPDATE command.
