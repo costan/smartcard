@@ -30,7 +30,7 @@ class ApduError < RuntimeError
   def initialize(response)
     @data = response[:data]
     @status = response[:status]
-    super ApduError.message_for_apdu_response response
+    super ApduError.message_for_apdu_response(response)
   end
   
   # Computes the exception message for an APDU response.
