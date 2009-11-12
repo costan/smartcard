@@ -66,8 +66,6 @@ class JcopRemoteServer
   # The options hash supports the following keys:
   #   port:: the port to serve on
   #   ip:: the IP of the interface to serve on (defaults to all interfaces)
-  #   reusable:: if set, the serving port can be shared with another
-  #              application (REUSEADDR flag will be set on the socket)
   #
   # If the |serving_logic| parameter is nil, a serving logic implementation
   # must be provided when calling JcopRemoteServer#run. The server will crash
@@ -126,8 +124,7 @@ class JcopRemoteServer
     end
     
     # TODO(costan): figure out a way to let serving logic reach this directly.
-  end
-  
+  end  
   
   # Creates a socket listening to incoming connections to this server.
   # 
@@ -141,17 +138,9 @@ class JcopRemoteServer
   def serving_socket(options)
     port = options[:port] || 0
     interface_ip = options[:ip] || '0.0.0.0'
-    serving_address = Socket.pack_sockaddr_in port, interface_ip
-    
-    socket = Socket.new Socket::AF_INET, Socket::SOCK_STREAM,
-                        Socket::PF_UNSPEC
-    
-    if options[:reusable]
-      socket.setsockopt Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true
-    end
-    socket.setsockopt Socket::IPPROTO_TCP, Socket::TCP_NODELAY, true      
-    socket.bind serving_address
-    socket.listen 5
+    socket = Zerg::Support::SocketFactory.socket :in_addr => interface_ip,
+        :in_port => port, :no_delay => true, :reuse_addr => true
+    socket.listen
     socket
   end
   private :serving_socket

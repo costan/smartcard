@@ -4,7 +4,7 @@
 # Copyright:: Copyright (C) 2008 Massachusetts Institute of Technology
 # License:: MIT
 
-require 'socket'
+require 'zerg_support'
 
 # :nodoc: namespace
 module Smartcard::Iso
@@ -43,16 +43,8 @@ class JcopRemoteTransport
   # Makes a transport-level connection to the TEM.
   def connect
     begin
-      Socket.getaddrinfo(@host, @port, Socket::AF_INET,
-                         Socket::SOCK_STREAM).each do |addr_info|
-        begin
-          @socket = Socket.new(addr_info[4], addr_info[5], addr_info[6])
-          @socket.connect Socket.pack_sockaddr_in(addr_info[1], addr_info[3])
-          break
-        rescue
-          @socket = nil
-        end
-      end  
+      @socket = Zerg::Support::SocketFactory.socket :out_addr => @host,
+          :out_port => @port, :no_delay => true
       raise 'Connection refused' unless @socket
       
       # Wait for the card to be inserted.
