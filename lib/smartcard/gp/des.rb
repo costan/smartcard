@@ -29,10 +29,13 @@ module Des
   #   data:: the data to be encrypted or decrypted
   #   iv:: initialization vector
   #   decrypt:: if +false+ performs encryption, otherwise performs decryption
+  #   use_ecb:: if +false+, uses the CBC mode, otherwise uses ECB
   #
   # Returns the encrypted / decrypted data.
-  def self.crypt(key, data, iv = nil, decrypt = false)
-    cipher_name = key.length == 8 ? 'DES-CBC' : 'DES-EDE-CBC'
+  def self.crypt(key, data, iv = nil, decrypt = false, use_ecb = false)
+    cipher_name = key.length == 8 ? 'DES' : 'DES-EDE'
+    cipher_name += use_ecb ? '' : '-CBC'
+    
     cipher = OpenSSL::Cipher::Cipher.new cipher_name
     decrypt ? cipher.decrypt : cipher.encrypt
     cipher.key = key
@@ -55,13 +58,13 @@ module Des
     crypt(key, data[-8, 8], iv)
   end
   
-  def self.mac_3des(key, data)
+  def self.mac_3des(key, data, iv = nil)
     # Output transformation: add 80, then 00 until it's block-sized.
     data = data + "\x80"
     data += "\x00" * (8 - data.length % 8) unless data.length % 8 == 0
     
     # The MAC is the last block from 3DES-encrypting the data.
-    crypt(key, data)[-8, 8]
+    crypt(key, data, iv)[-8, 8]
   end
 end  # module Smartcard::Gp::Des
 

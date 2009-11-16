@@ -1,3 +1,5 @@
+v0.4.11. Support for GlobalPlatform's SC01 (Secure Channel 1) protocol.
+
 v0.4.10. Removed hardcoded card manager AID.
 
 v0.4.9. Disabled Nagle's algorithm in the remote JCOP transport.

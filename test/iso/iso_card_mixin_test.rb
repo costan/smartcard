@@ -42,6 +42,10 @@ class IsoCardMixinTest < Test::Unit::TestCase
                  s[:cla => 0x80, :ins => 0x0F, :p1 => 0xBA, :p2 => 0xBE,
                    :data => [0x31, 0x41, 0x59]],
                  'Specified everything'
+    assert_equal [0x80, 0x0F, 0xBA, 0xBE, 0x03, 0x31, 0x41, 0x59],
+                 s[:cla => 0x80, :ins => 0x0F, :p1 => 0xBA, :p2 => 0xBE,
+                   :data => [0x31, 0x41, 0x59], :le => false],
+                 'Specified everything, Le=false'
     assert_raise(RuntimeError, 'Did not specify INS') do
       s[:cla => 0x80, :p1 => 0xBA, :p2 => 0xBE, :data => [0x31, 0x41, 0x59]]
     end

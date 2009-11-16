@@ -31,10 +31,10 @@ lib/smartcard/iso/jcop_remote_transport.rb
 lib/smartcard/iso/pcsc_transport.rb
 lib/smartcard/iso/transport.rb
 lib/smartcard/pcsc/pcsc_exception.rb
-smartcard.gemspec
 test/gp/asn1_ber_test.rb
 test/gp/cap_loader_test.rb
 test/gp/des_test.rb
+test/gp/gp_card_mixin_compat_test.rb
 test/gp/gp_card_mixin_test.rb
 test/gp/hello.apdu
 test/gp/hello.cap

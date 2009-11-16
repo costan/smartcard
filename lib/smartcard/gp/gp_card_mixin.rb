@@ -63,10 +63,18 @@ module GpCardMixin
                     :data => host_challenge
     response = {
       :key_diversification => raw[0, 10],
-      :key_version => raw[10], :protocol_id => raw[11],
-      :counter => raw[12, 2].pack('C*').unpack('n').first,
-      :challenge => raw[14, 6], :auth => raw[20, 8]
+      :key_version => raw[10], :protocol_id => raw[11], :auth => raw[20, 8]
     }
+    case response[:protocol_id]
+    when 1
+      response[:challenge] = raw[12, 8]
+    when 2
+      response.merge! :counter => raw[12, 2].pack('C*').unpack('n').first,
+                      :challenge => raw[14, 6] 
+    else
+      raise "Unimplemented Secure Channel protocol #{response[:protocol_id]}"
+    end
+    response
   end
   
   # Wrapper around iso_apdu! that adds a MAC to the APDU.
@@ -76,11 +84,13 @@ module GpCardMixin
     apdu_data[:data] = (apdu_data[:data] || []) + [0, 0, 0, 0, 0, 0, 0, 0]
     
     apdu_bytes = Smartcard::Iso::IsoCardMixin.serialize_apdu(apdu_data)[0...-9]
-    mac = Des.mac_retail @gp_secure_channel_keys[:cmac], apdu_bytes.pack('C*'),
-                         @gp_secure_channel_keys[:mac_iv]
+    mac = Des.send @gp_secure_channel_mac,
+                   @gp_secure_channel_keys[:cmac], apdu_bytes.pack('C*'),
+                   @gp_secure_channel_keys[:mac_iv]
     @gp_secure_channel_keys[:mac_iv] = mac
     
     apdu_data[:data][apdu_data[:data].length - 8, 8] = mac.unpack('C*')
+    apdu_data[:le] = false
     iso_apdu! apdu_data
   end
     
@@ -117,32 +127,51 @@ module GpCardMixin
   def secure_channel(keys = gp_development_keys)
     host_challenge = Des.random_bytes 8
     card_info = gp_setup_secure_channel host_challenge.unpack('C*')
-    card_counter = [card_info[:counter]].pack('n')
     card_challenge = card_info[:challenge].pack('C*')
 
     # Compute session keys.
     session_keys = {}
-    derivation_data = "\x01\x01" + card_counter + "\x00" * 12
-    session_keys[:cmac] = Des.crypt keys[:smac], derivation_data    
-    derivation_data[0, 2] = "\x01\x02"
-    session_keys[:rmac] = Des.crypt keys[:smac], derivation_data
-    derivation_data[0, 2] = "\x01\x82"
-    session_keys[:senc] = Des.crypt keys[:senc], derivation_data
-    derivation_data[0, 2] = "\x01\x81"
-    session_keys[:dek] = Des.crypt keys[:dek], derivation_data
+    case card_info[:protocol_id]
+    when 1  # Secure Channel 01 (GlobalPlatform 2.0)
+      derivation_data = card_challenge[4, 4] + host_challenge[0, 4] +
+                        card_challenge[0, 4] + host_challenge[4, 4]
+      session_keys[:cmac] = Des.crypt keys[:smac], derivation_data,
+                                      nil, false, true
+      session_keys[:rmac] = session_keys[:cmac]
+      session_keys[:senc] = Des.crypt keys[:senc], derivation_data,
+                                      nil, false, true
+      session_keys[:dek] = keys[:dek].dup
+      
+      card_auth = Des.mac_3des session_keys[:senc],
+                               host_challenge + card_challenge
+      host_auth = Des.mac_3des session_keys[:senc],
+                               card_challenge + host_challenge
+      @gp_secure_channel_mac = :mac_3des
+    when 2  # Secure Channel 02 (GlobalPlatform 2.1+)
+      card_counter = [card_info[:counter]].pack('n')
+      derivation_data = "\x01\x01" + card_counter + "\x00" * 12
+      session_keys[:cmac] = Des.crypt keys[:smac], derivation_data    
+      derivation_data[0, 2] = "\x01\x02"
+      session_keys[:rmac] = Des.crypt keys[:smac], derivation_data
+      derivation_data[0, 2] = "\x01\x82"
+      session_keys[:senc] = Des.crypt keys[:senc], derivation_data
+      derivation_data[0, 2] = "\x01\x81"
+      session_keys[:dek] = Des.crypt keys[:dek], derivation_data
+
+      card_auth = Des.mac_3des session_keys[:senc],
+          host_challenge + card_counter + card_challenge
+      host_auth = Des.mac_3des session_keys[:senc],
+          card_counter + card_challenge + host_challenge
+      @gp_secure_channel_mac = :mac_retail
+    else
+      raise "Unimplemented Secure Channel #{card_info[:protocol_id]}"
+    end
     session_keys[:mac_iv] = "\x00" * 8
     @gp_secure_channel_keys = session_keys
         
-    # Compute authentication cryptograms.
-    card_auth = Des.mac_3des session_keys[:senc],
-        host_challenge + card_counter + card_challenge
-    host_auth = Des.mac_3des session_keys[:senc],
-        card_counter + card_challenge + host_challenge
-        
     unless card_auth == card_info[:auth].pack('C*')
       raise 'Card authentication invalid' 
-    end    
-
+    end
     gp_lock_secure_channel host_auth.unpack('C*')
   end
   

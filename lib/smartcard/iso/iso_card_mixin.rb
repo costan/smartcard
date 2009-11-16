@@ -55,6 +55,8 @@ module IsoCardMixin
   #   p12:: 2-byte array containing the P1 and P2 bytes in the APDU
   #   p1, p2:: the P1 and P2 bytes in the APDU (optional, both default to 0)
   #   data:: the extra data in the APDU (optional, defaults to nothing)
+  #   le:: the expected data length (defaults to 0; set to +false+ to avoid
+  #        sending an Le byte)
   def self.serialize_apdu(apdu_data)
     raise 'Unspecified INS in apdu_data' unless apdu_data[:ins]
     apdu = [ apdu_data[:cla] || 0, apdu_data[:ins] ]
@@ -73,7 +75,7 @@ module IsoCardMixin
     else
       apdu << 0
     end
-    apdu << (apdu_data[:le] || 0)
+    apdu << (apdu_data[:le] || 0) unless apdu_data[:le] == false
     apdu
   end
   

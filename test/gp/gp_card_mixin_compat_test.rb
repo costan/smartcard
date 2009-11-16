@@ -1,0 +1,99 @@
+# Author:: Victor Costan
+# Copyright:: Copyright (C) 2008 Massachusetts Institute of Technology
+# License:: MIT
+
+require 'smartcard'
+
+require 'test/unit'
+
+require 'rubygems'
+require 'flexmock/test_unit'
+
+
+# Tests the GlobalPlatform code against old (secure channel 01) cards.
+class GpCardMixinCompatTest < Test::Unit::TestCase
+  GpCardMixin = Smartcard::Gp::GpCardMixin
+  
+  # The sole purpose of this class is wrapping the mixin under test.
+  class MixinWrapper
+    include GpCardMixin
+  end
+  
+  def setup
+    @host_auth = [0x00, 0x65, 0x07, 0x37, 0xD4, 0xB8, 0xDF, 0xDE, 0xD0, 0x7B,
+                  0xAA, 0xA2, 0xDE, 0xDE, 0x82, 0x8B]    
+    @host_challenge = [0x83, 0x6B, 0x31, 0x7D, 0xE1, 0x57, 0x45, 0x53]
+    @max_apdu_length = 0x0F
+  end
+
+  def mock_card_manager_query(channel_mock)
+    flexmock(channel_mock).should_receive(:exchange_apdu).
+        with([0x00, 0xA4, 0x04, 0x00, 0x00, 0x00]).
+        and_return([0x6F, 16, 0x84, 8, 0xA0, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00,
+                    0x00, 0xA5, 4, 0x9F, 0x65, 1, 0x0F, 0x90, 0x00])    
+  end
+  
+  def test_gp_card_manager_aid
+    mock = MixinWrapper.new
+    mock_card_manager_query mock
+    golden = [0xA0, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00]
+    assert_equal golden, mock.gp_card_manager_aid
+  end
+  
+  def mock_card_manager_select(channel_mock)
+    flexmock(channel_mock).should_receive(:exchange_apdu).
+        with([0x00, 0xA4, 0x04, 0x00, 0x08, 0xA0, 0x00, 0x00, 0x00, 0x03, 0x00,
+              0x00, 0x00, 0x00]).
+        and_return([0x6F, 16, 0x84, 8, 0xA0, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00,
+                    0x00, 0xA5, 4, 0x9F, 0x65, 1, 0x0F, 0x90, 0x00])    
+  end
+    
+  def test_select_application
+    mock = MixinWrapper.new
+    mock_card_manager_query mock
+    mock_card_manager_select mock
+    app_data = mock.select_application mock.gp_card_manager_aid
+
+    golden = { :aid => mock.gp_card_manager_aid, :max_apdu_length => 0x0F }
+    assert_equal golden, app_data
+  end
+    
+  def mock_channel_setup(channel_mock)
+    flexmock(channel_mock).should_receive(:exchange_apdu).
+       with([0x80, 0x50, 0x00, 0x00, 0x08, 0x83, 0x6B, 0x31, 0x7D, 0xE1, 0x57,
+             0x45, 0x53, 0x00]).
+       and_return([0x00, 0x00, 0x63, 0x06, 0x00, 0x22, 0x04, 0x91, 0x06, 0x77,
+                   0xFF, 0x01, 0xB8, 0xAA, 0x0E, 0xF4, 0xD5, 0x56, 0x77, 0x90,
+                   0x84, 0x03, 0xF4, 0x96, 0x93, 0x1E, 0x30, 0x48, 0x90, 0x00])
+    flexmock(Smartcard::Gp::Des).should_receive(:random_bytes).with(8).
+                                 and_return(@host_challenge.pack('C*'))    
+  end
+  
+  def test_gp_setup_secure_channel
+    mock = MixinWrapper.new
+    mock_channel_setup mock
+    golden = {
+        :key_diversification => [0x00, 0x00, 0x63, 0x06, 0x00, 0x22, 0x04, 0x91,
+                                 0x06, 0x77],
+        :key_version => 0xFF, :protocol_id => 1,
+        :challenge => [0xB8, 0xAA, 0x0E, 0xF4, 0xD5, 0x56, 0x77, 0x90],
+        :auth => [0x84, 0x03, 0xF4, 0x96, 0x93, 0x1E, 0x30, 0x48]
+    }
+    assert_equal golden, mock.gp_setup_secure_channel(@host_challenge)
+  end
+  
+  def mock_channel_lock(channel_mock)
+    flexmock(channel_mock).should_receive(:exchange_apdu).
+       with([0x84, 0x82, 0x00, 0x00, 0x10, 0xC2, 0x3F, 0x1D, 0x4D, 0xA5, 0x5F,
+             0xC7, 0x5F, 0x6C, 0x3A, 0x7A, 0x06, 0x05, 0xB4, 0xAE, 0x18]).
+       and_return([0x90, 0x00])  
+  end
+  
+  def test_secure_channel
+    mock = MixinWrapper.new
+    mock_channel_setup mock
+    mock_channel_lock mock
+
+    mock.secure_channel
+  end
+end
