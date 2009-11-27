@@ -1,5 +1,10 @@
 # Contains information about an exception at the PC/SC layer.
-class Smartcard::PCSC::Exception  
-  # The error number returned by the failed PC/SC function call. Should be one of the Smartcard::PCSC::SCARD_E_ constants.
-  attr_reader :errno
+class Smartcard::PCSC::Exception  < RuntimeError
+  def initialize(error_status)
+    @pcsc_status = error_status
+    super error_status.to_s
+  end
+  
+  # The PC/SC error status that caused this error.
+  attr_reader :pcsc_status
 end

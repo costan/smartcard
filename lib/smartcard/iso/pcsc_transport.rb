@@ -24,7 +24,7 @@ class PcscTransport
 
   def exchange_apdu(apdu)
     xmit_apdu_string = apdu.pack('C*')
-    result_string = @card.transmit xmit_apdu_string, @xmit_ioreq, @recv_ioreq
+    result_string = @card.transmit xmit_apdu_string
     return result_string.unpack('C*')
   end
   
@@ -33,51 +33,41 @@ class PcscTransport
   end
   
   def connect
-    @context = PCSC::Context.new(PCSC::SCOPE_SYSTEM) if @context.nil?
+    @context = PCSC::Context.new if @context.nil?
     
     if @options[:reader_name]
       @reader_name = @options[:reader_name]
     else
-      # get the first reader      
-      readers = @context.list_readers nil
+      # Get the first reader.
+      readers = @context.readers
       @reader_name = readers[@options[:reader_index] || 0]
     end
     
-    # get the reader's status
-    reader_states = PCSC::ReaderStates.new(1)
-    reader_states.set_reader_name_of!(0, @reader_name)
-    reader_states.set_current_state_of!(0, PCSC::STATE_UNKNOWN)
-    @context.get_status_change reader_states, 100
-    reader_states.acknowledge_events!
+    # Query the reader's status.
+    queries = PCSC::ReaderStateQueries.new 1
+    queries[0].reader_name = @reader_name
+    queries[0].current_state = :unknown
+    @context.wait_for_status_change queries, 100
+    queries.ack_changes
     
-    # prompt for card insertion unless that already happened
-    if (reader_states.current_state_of(0) & PCSC::STATE_PRESENT) == 0
-      puts "Please insert TEM card in reader #{@reader_name}\n"
-      while (reader_states.current_state_of(0) & PCSC::STATE_PRESENT) == 0 do
-        @context.get_status_change reader_states, PCSC::INFINITE_TIMEOUT
-        reader_states.acknowledge_events!
+    # Prompt for card insertion unless that already happened.
+    unless queries[0].current_state.include? :present
+      puts "Please insert smart-card card in reader #{@reader_name}\n"
+      until queries[0].current_state.include? :presentt do
+        @context.wait_for_status_change queries
+        queries.ack_changes
       end
       puts "Card detected\n"
     end
     
-    # connect to card
-    @card = PCSC::Card.new @context, @reader_name, PCSC::SHARE_EXCLUSIVE,
-                           PCSC::PROTOCOL_ANY
-    
-    # build the transmit / receive IoRequests
-    status = @card.status
-    @xmit_ioreq = @@xmit_iorequest[status[:protocol]]
-    @atr = status[:atr]
-    if RUBY_PLATFORM =~ /win/ and (not RUBY_PLATFORM =~ /darwin/)
-      @recv_ioreq = nil
-    else
-      @recv_ioreq = PCSC::IoRequest.new
-    end
+    # Connect to the card.
+    @card = @context.card @reader_name, :shared 
+    @atr = @card.info[:atr]
   end
   
   def disconnect
     unless @card.nil?
-      @card.disconnect PCSC::DISPOSITION_LEAVE
+      @card.disconnect
       @card = nil
       @atr = nil
     end
@@ -90,12 +80,7 @@ class PcscTransport
   def to_s
     "#<PC/SC Terminal: disconnected>" if @card.nil?
     "#<PC/SC Terminal: #{@reader_name}>"
-  end
-  
-  @@xmit_iorequest = {
-    Smartcard::PCSC::PROTOCOL_T0 => Smartcard::PCSC::IOREQUEST_T0,
-    Smartcard::PCSC::PROTOCOL_T1 => Smartcard::PCSC::IOREQUEST_T1,
-  }
+  end  
 end  # class PcscTransport
 
 end  # module Smartcard::Iso

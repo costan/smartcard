@@ -1,14 +1,4 @@
 .loadpath
-*.bundle
-*.def
-*.exp
-*.lib
-*.o
-*.obj
-*.pdb
-*.so
-*_autogen.*
 Makefile
 doc
-mkmf.log
 pkg

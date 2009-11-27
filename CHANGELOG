@@ -1,3 +1,5 @@
+v0.5.0. Dropped C extension in favor of FFI. Hello, jruby and rbx!
+
 v0.4.11. Support for GlobalPlatform's SC01 (Secure Channel 1) protocol.
 
 v0.4.10. Removed hardcoded card manager AID.
