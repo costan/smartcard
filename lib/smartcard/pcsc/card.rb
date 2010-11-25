@@ -35,8 +35,9 @@ class Card
     raise Smartcard::PCSC::Exception, status unless status == :success
     
     @context = context
+    @sharing_mode = sharing_mode
+    @_handle = handle_ptr[:value]    
     set_protocol FFILib::Protocol[protocol_ptr[:value]]
-    @_handle = handle_ptr[:value]      
   end
   
   # Updates internal buffers to reflect a change in the communication protocol. 
@@ -50,12 +51,16 @@ class Card
       @send_pci = @recv_pci = FFILib::PCI_T1
     when :raw
       @send_pci = @recv_pci = FFILib::PCI_RAW
+    else
+      reconnect sharing_mode, guess_protocol_from_atr, :leave
+      return self      
     end
     
     # Windows really doesn't like a receiving IoRequest.
     if FFI::Platform.windows? || FFI::Platform.mac?
       @recv_pci = nil
     end
+    self
   end
   private :set_protocol
   
@@ -78,6 +83,7 @@ class Card
         preferred_protocols, disposition, protocol_ptr
     raise Smartcard::PCSC::Exception, status unless status == :success
   
+    @sharing_mode = sharing_mode
     set_protocol FFILib::Protocol[protocol_ptr[:value]]
   end
   
@@ -269,6 +275,17 @@ class Card
     end
   end
   
+  # Returns the first valid protocol listed in the card's ATR.  
+  def guess_protocol_from_atr
+    atr = info[:atr]
+    
+    # TODO(costan): proper ATR decoding logic
+    atr_protocols = [:t0]
+
+    atr_protocols.first
+  end
+  private :guess_protocol_from_atr
+  
   # The low-level _SCARDHANDLE_ data.
   #
   # This should not be used by client code.
@@ -276,6 +293,9 @@ class Card
   
   # The communication protocol in use with this smart-card.
   attr_reader :protocol
+  
+  # The sharing mode for this smart-card session. (:shared or :exclusive)
+  attr_reader :sharing_mode
 end  # class Smartcard::PCSC::Card
 
 end  # namespace Smartcard::PCSC

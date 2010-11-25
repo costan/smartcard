@@ -6,6 +6,9 @@ require 'smartcard'
 
 require 'test/unit'
 
+require 'rubygems'
+require 'flexmock/test_unit'
+
 
 class CardTest < Test::Unit::TestCase
   def setup
@@ -19,8 +22,13 @@ class CardTest < Test::Unit::TestCase
     @context.release    
   end
   
+  def test_sharing_mode
+    assert_equal :shared, @card.sharing_mode
+  end
+
   def test_reconnect
     @card.reconnect :shared
+    assert_equal :shared, @card.sharing_mode
   end
   
   def test_transaction
@@ -64,5 +72,17 @@ class CardTest < Test::Unit::TestCase
     assert_raise(Smartcard::PCSC::Exception, 'Control sequence') do
       ctl_response = @card.control 0x42000001, [0x02].pack('C*')
     end
+  end
+  
+  def test_set_protocol_guesses
+    flexmock(@card).should_receive(:guess_protocol_from_atr).and_return(:t0)
+    flexmock(@card).should_receive(:reconnect).with(:shared, :t0, :leave)
+    @card.send :set_protocol, :unset
+  end
+  
+  def test_guess_protocol_from_atr
+    flexmock(@card).should_receive(:info).and_return(:atr => 
+        ";\212\001JCOP41V221\377")
+    assert_equal :t0, @card.send(:guess_protocol_from_atr)    
   end
 end
