@@ -35,3 +35,7 @@ the {Trusted Computing group}[http://projects.csail.mit.edu/tc/].
 The work is funded by a grant from
 {Quanta Computer Inc}[http://www.quanta.com.tw], under the
 {T-Party Project}[http://projects.csail.mit.edu/tparty/].
+
+Kevin Redon <kevredon@mail.tsaitgaist.info> provided information and a failing
+test case for ATR-based protocol detection, which is necessary if the PC/SC
+driver doesn't do it automatically.
