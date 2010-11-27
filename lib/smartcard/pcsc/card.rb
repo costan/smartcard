@@ -40,7 +40,11 @@ class Card
     set_protocol FFILib::Protocol[protocol_ptr[:value]]
   end
   
-  # Updates internal buffers to reflect a change in the communication protocol. 
+  # Updates internal buffers to reflect a change in the communication protocol.
+  #
+  # Args:
+  #   protocol:: the protocol to change to; if invalid, the card's ATR will be
+  #              used to guess a valid protocol
   def set_protocol(protocol)
     @protocol = protocol
     
@@ -279,10 +283,33 @@ class Card
   def guess_protocol_from_atr
     atr = info[:atr]
     
-    # TODO(costan): proper ATR decoding logic
-    atr_protocols = [:t0]
+    # NOTE: inspired from the following sources:
+    #       http://en.wikipedia.org/wiki/Answer_to_reset
+    #       http://www.atmel.com/dyn/resources/prod_documents/doc5025.pdf
+    #       http://pyscard.sourceforge.net/epydoc/smartcard.ATR-pysrc.html#ATR.__initInstance__
+    atr_bytes = atr.unpack('C*')
+    protocols = []
+    i = 1
+    loop do
+      next_nibble = atr_bytes[i] >> 4
+      next_bits = (0...4).map { |j| (next_nibble >> j) & 1 }
+      next_bits.each { |bit| i += bit }
+      if next_bits[3] == 1  # TD byte was last, i is right on it
+        protocols << (atr_bytes[i] & 0x0f)                
+      else
+        break  # No TD, no more bytes
+      end
+    end
 
-    atr_protocols.first
+    protocols.sort!    
+    case protocols[0]
+    when 0
+      :t0
+    when 1
+      :t1
+    else
+      :t0
+    end
   end
   private :guess_protocol_from_atr
   

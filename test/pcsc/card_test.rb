@@ -79,10 +79,16 @@ class CardTest < Test::Unit::TestCase
     flexmock(@card).should_receive(:reconnect).with(:shared, :t0, :leave)
     @card.send :set_protocol, :unset
   end
-  
-  def test_guess_protocol_from_atr
+
+  def test_guess_protocol_t0_from_atr
     flexmock(@card).should_receive(:info).and_return(:atr => 
-        ";\212\001JCOP41V221\377")
+        ";\026\224q\001\001\005\002\000")    
     assert_equal :t0, @card.send(:guess_protocol_from_atr)    
+  end
+  
+  def test_guess_protocol_t1_from_atr
+    flexmock(@card).should_receive(:info).and_return(:atr => 
+        ";\212\001JCOP41V221\377")    
+    assert_equal :t1, @card.send(:guess_protocol_from_atr)    
   end
 end
