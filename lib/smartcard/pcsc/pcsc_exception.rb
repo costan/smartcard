@@ -2,7 +2,7 @@
 class Smartcard::PCSC::Exception  < RuntimeError
   def initialize(error_status)
     @pcsc_status = error_status
-    super error_status.to_s
+    super '0x%x' % (2**32 + error_status)
   end
   
   # The PC/SC error status that caused this error.

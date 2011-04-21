@@ -29,8 +29,8 @@ module FFILib
     SCARD_E_DUPLICATE_READER = 0x8010001B
     SCARD_E_NO_SERVICE = 0x8010001D
     SCARD_E_SERVICE_STOPPED = 0x8010001E
-    SCARD_W_CARD_NOT_AUTHENTICATED = 0x8010006F
     SCARD_E_UNSUPPORTED_FEATURE = 0x8010001F
+    SCARD_W_CARD_NOT_AUTHENTICATED = 0x8010006F
     SCARD_S_SUCCESS = 0x00000000
     SCARD_E_NO_KEY_CONTAINER = 0x80100030
     SCARD_W_CANCELLED_BY_USER = 0x8010006E
@@ -63,7 +63,6 @@ module FFILib
     SCARD_E_INVALID_CHV = 0x8010002A
     SCARD_W_UNSUPPORTED_CARD = 0x80100065
     SCARD_W_UNRESPONSIVE_CARD = 0x80100066
-    SCARD_W_INSERTED_CARD = 0x8010006A
     SCARD_SCOPE_USER = 0x00000000
     SCARD_SCOPE_SYSTEM = 0x00000002
     SCARD_SCOPE_TERMINAL = 0x00000001
@@ -175,8 +174,8 @@ module FFILib
     :duplicate_reader, Consts::SCARD_E_DUPLICATE_READER,
     :no_service, Consts::SCARD_E_NO_SERVICE,
     :service_stopped, Consts::SCARD_E_SERVICE_STOPPED,
-    :card_not_authenticated, Consts::SCARD_W_CARD_NOT_AUTHENTICATED,
     :unsupported_feature, Consts::SCARD_E_UNSUPPORTED_FEATURE,
+    :card_not_authenticated, Consts::SCARD_W_CARD_NOT_AUTHENTICATED,
     :success, Consts::SCARD_S_SUCCESS,
     :no_key_container, Consts::SCARD_E_NO_KEY_CONTAINER,
     :cancelled_by_user, Consts::SCARD_W_CANCELLED_BY_USER,
@@ -209,7 +208,6 @@ module FFILib
     :invalid_chv, Consts::SCARD_E_INVALID_CHV,
     :unsupported_card, Consts::SCARD_W_UNSUPPORTED_CARD,
     :unresponsive_card, Consts::SCARD_W_UNRESPONSIVE_CARD,
-    :inserted_card, Consts::SCARD_W_INSERTED_CARD,
   ]
 
   # Values for the context's scope.

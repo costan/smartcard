@@ -1,3 +1,5 @@
+v0.5.2. Added 'thread' require to fix crashes on new Rubygems versions.
+
 v0.5.1. Work around drivers that don't honor PROTOCOL_ANY.
 
 v0.5.0. Dropped C extension in favor of FFI. Hello, jruby and rbx!

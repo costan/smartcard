@@ -5,6 +5,7 @@
 # License:: MIT
 
 require 'socket'
+require 'thread'
 
 # :nodoc: namespace
 module Smartcard::Iso
