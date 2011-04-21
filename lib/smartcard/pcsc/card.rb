@@ -36,8 +36,8 @@ class Card
     
     @context = context
     @sharing_mode = sharing_mode
-    @_handle = handle_ptr[:value]    
-    set_protocol FFILib::Protocol[protocol_ptr[:value]]
+    @_handle = handle_ptr[:value]
+    set_protocol FFILib::PROTOCOLS[protocol_ptr[:value]]
   end
   
   # Updates internal buffers to reflect a change in the communication protocol.
@@ -268,7 +268,7 @@ class Card
         end
         
         { :readers => Context.decode_multi_string(readers_ptr),
-          :protocol => FFILib::Protocol[protocol_ptr[:value]],
+          :protocol => FFILib::PROTOCOLS[protocol_ptr[:value]],
           :atr => atr_ptr.get_bytes(0, atr_length_ptr[:value]),
           :state => state }
       ensure

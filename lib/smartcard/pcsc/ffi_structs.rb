@@ -41,6 +41,9 @@ module FFILib
     layout :protocol, Word,
            :pci_length, Word
   end
+  
+  # Protocol enum members, indexed by their numeric value.
+  PROTOCOLS = Protocol.to_h.invert
 
   # Global variables for IoRequests for protocols T=0, T=1, and RAW.
   begin
