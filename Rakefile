@@ -23,9 +23,13 @@ Echoe.new('smartcard') do |p|
       /^(lib|bin|tasks|ext)|^BUILD|^README|^CHANGELOG|^TODO|^LICENSE|^COPYING$/  
 end
 
+file 'lib/smartcard/pcsc/ffi_autogen.rb' => 'tasks/ffi_codegen.rb' do
+  Smartcard::Tasks.generate_ffi_header
+end
+
 unless FFI::Platform.windows?
-  task :package => :ffi_header
-  task :test => :ffi_header
+  task :package => 'lib/smartcard/pcsc/ffi_autogen.rb'
+  task :test => 'lib/smartcard/pcsc/ffi_autogen.rb'
 end
 
 if $0 == __FILE__

@@ -19,11 +19,11 @@ lib/smartcard/iso/pcsc_transport.rb
 lib/smartcard/iso/transport.rb
 lib/smartcard/pcsc/card.rb
 lib/smartcard/pcsc/context.rb
+lib/smartcard/pcsc/exception.rb
 lib/smartcard/pcsc/ffi_autogen.rb
 lib/smartcard/pcsc/ffi_functions.rb
 lib/smartcard/pcsc/ffi_lib.rb
 lib/smartcard/pcsc/ffi_structs.rb
-lib/smartcard/pcsc/pcsc_exception.rb
 lib/smartcard/pcsc/reader_state_queries.rb
 tasks/ffi_codegen.rb
 test/gp/asn1_ber_test.rb
@@ -39,4 +39,5 @@ test/iso/iso_exception_test.rb
 test/iso/jcop_remote_test.rb
 test/pcsc/card_test.rb
 test/pcsc/context_test.rb
+test/pcsc/exception_test.rb
 test/pcsc/reader_state_queries_test.rb

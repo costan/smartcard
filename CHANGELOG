@@ -1,3 +1,5 @@
+v0.5.4. Fixed ReaderStateQuery to work when the status has bits not defined in the PCSC header.
+
 v0.5.3. Fixed buggy protocol number decoding logic.
 
 v0.5.2. Added 'thread' require to fix crashes on new Rubygems versions.
