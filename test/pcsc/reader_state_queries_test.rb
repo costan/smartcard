@@ -51,6 +51,16 @@ class ReaderStatesTest < Test::Unit::TestCase
                  'event_state'
   end
   
+  def test_high_order_bits_in_states
+    packed_state = 0xFFFFFFFF
+    unpacked_state = Smartcard::PCSC::FFILib::ReaderStateQuery.
+        unpack_state packed_state
+    repacked_state = Smartcard::PCSC::FFILib::ReaderStateQuery.
+        pack_state unpacked_state
+    assert_equal repacked_state, packed_state
+    assert_operator unpacked_state, :include?, :atrmatch
+  end
+  
   def test_reader_names
     assert_equal 'PC/SC Reader 0', @queries[0].reader_name
     assert_equal 'CCID Reader 1', @queries[1].reader_name

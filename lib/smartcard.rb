@@ -4,11 +4,11 @@ end
 
 require 'smartcard/pcsc/card.rb'
 require 'smartcard/pcsc/context.rb'
+require 'smartcard/pcsc/exception.rb'
 require 'smartcard/pcsc/ffi_lib.rb'
 require 'smartcard/pcsc/ffi_autogen.rb'
 require 'smartcard/pcsc/ffi_structs.rb'
 require 'smartcard/pcsc/ffi_functions.rb'
-require 'smartcard/pcsc/pcsc_exception.rb'
 require 'smartcard/pcsc/reader_state_queries.rb'
 
 require 'smartcard/iso/apdu_error.rb'

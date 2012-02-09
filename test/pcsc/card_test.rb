@@ -7,7 +7,6 @@ require 'smartcard'
 
 require 'test/unit'
 
-require 'rubygems'
 require 'flexmock/test_unit'
 
 

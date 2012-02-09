@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'echoe'
 
-require 'tasks/ffi_codegen.rb' 
+require './tasks/ffi_codegen.rb' 
 
 Echoe.new('smartcard') do |p|
   p.project = 'smartcard' # rubyforge project

@@ -41,7 +41,7 @@ class ReaderStateQueries
   # This is a convenience method intended to be called after
   # Smartcard::PCSC::Context#wait_for_status_change.
   def ack_changes
-    @queries.each { |query| query.current_state = query.event_state }
+    @queries.each { |query| query[:current_state] = query[:event_state] }
   end
   
   # Called by FFI::AutoPointer to release the reader states array.
@@ -148,18 +148,32 @@ class FFILib::ReaderStateQuery
   def self.pack_state(unpacked_state)
     if unpacked_state.kind_of? Enumerable
       state = 0
-      unpacked_state.each { |bit| state |= FFILib::CardState[bit] }
+      unpacked_state.each do |symbol_bit_or_number|
+        if FFILib::CardState[symbol_bit_or_number]
+          state |= FFILib::CardState[symbol_bit_or_number]
+        else
+          state |= symbol_bit_or_number
+        end
+      end
       return state
     end
     FFILib::CardState[unpacked_state]
   end
 
   # Unpacks a numeric card state into a Set of symbols.
+  #
+  # The returned Set may also have an Integer in it, if any of the bits set in
+  # the packed state are not covered by the mapping in FFILib::CardState.
   def self.unpack_state(packed_state)
     state = Set.new
-    FFILib::CardState.to_h.each do |bit, mask|
-      state << bit if (packed_state & mask) == mask and mask != 0
+    FFILib::CardState.to_h.each do |symbol, mask|
+      next if mask == 0
+      if (packed_state & mask) == mask
+        state << symbol
+        packed_state ^= mask
+      end
     end
+    state << packed_state if packed_state != 0
     state
   end
 end
