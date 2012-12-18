@@ -1,4 +1,6 @@
 .loadpath
+*.sw*
+
 Makefile
 doc
 pkg

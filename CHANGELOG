@@ -1,3 +1,5 @@
+v0.5.5. Fixed crash in MRI 1.9.3.
+
 v0.5.4. Fixed ReaderStateQuery to work when the status has bits not defined in the PCSC header.
 
 v0.5.3. Fixed buggy protocol number decoding logic.
@@ -38,7 +40,7 @@ v0.3.1. Fixed documentation for the new PcscException class.
 
 v0.3.0. Added PcscException class used to wrap PC/SC exceptions.
 
-v0.2.3. Fixed minor bug in error string for PCSC::Card.transmit 
+v0.2.3. Fixed minor bug in error string for PCSC::Card.transmit
 
 v0.2.2. Fixed APDU exchange bugs on Windows
 	Restructured PCSC::IoRequest to allow PCI_ consts
@@ -51,7 +53,7 @@ v0.2.1. Added OSX Tiger support
 
 v0.2.0. Added automatic builds
 	Rakefile for auto builds using echoe
-	extconf.rb: hack to fix Windows makefiles 
+	extconf.rb: hack to fix Windows makefiles
 
 v0.1.2. Added Windows compatibility
 	*.c: restructured code so VC2005 likes it

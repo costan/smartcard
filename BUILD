@@ -75,3 +75,13 @@ Ubuntu (tested on 8.04, 8.10, 9.04 and 9.10):
 * libpcsclite-dev (depends on libpcsclite or libpcsclite1)
 * pcscd
 * pcsc-tools
+
+=== Fedora
+
+The following packages should do the trick on Fedora (tested on 18):
+* ruby-devel
+* pcsc-lite
+* pcsc-lite-ccid
+* pcsc-lite-devel
+* pcsc-lite-openct
+* pcsc-tools
