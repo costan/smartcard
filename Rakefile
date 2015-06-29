@@ -12,6 +12,7 @@ Echoe.new('smartcard') do |p|
   p.url = 'http://www.costan.us/smartcard'
   p.dependencies = ['ffi >=1.2.0',
                     'rubyzip >=0.9.9',
+                    'zip-zip >=0.3',
                     'zerg_support >=0.1.6']
   p.development_dependencies = ['echoe >=4.6.3',
                                 'flexmock >=1.2.0']
