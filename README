@@ -40,3 +40,6 @@ The work is funded by a grant from
 Kevin Redon <kevredon@mail.tsaitgaist.info> provided information and a failing
 test case for ATR-based protocol detection, which is necessary if the PC/SC
 driver doesn't do it automatically.
+
+The other contributors are listed in
+[the GitHub contributors list](https://github.com/costan/smartcard/graphs/contributors).
