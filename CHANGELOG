@@ -1,3 +1,5 @@
+v0.5.6. Add Enumerable capability to ReaderStateQueries.
+
 v0.5.5. Fixed crash in MRI 1.9.3.
 
 v0.5.4. Fixed ReaderStateQuery to work when the status has bits not defined in the PCSC header.

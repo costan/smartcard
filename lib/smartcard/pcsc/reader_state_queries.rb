@@ -12,6 +12,8 @@ module Smartcard::PCSC
 
 # A continuous array of reader state queries.
 class ReaderStateQueries
+  include Enumerable
+
   # Creates an array of reader state queries.
   #
   # The states are unusable until they are assigned reader names by calling
@@ -30,6 +32,11 @@ class ReaderStateQueries
     raise IndexError if index >= @queries.length
     @queries[index]
   end
+
+  # Mandatory for Enumerable mixin
+  def each(&block)
+    @queries.each &block
+  end
   
   # The number of queries in the array.
   def length
@@ -42,6 +49,21 @@ class ReaderStateQueries
   # Smartcard::PCSC::Context#wait_for_status_change.
   def ack_changes
     @queries.each { |query| query[:current_state] = query[:event_state] }
+  end
+
+  # Short cut: Select queries with 'changed' event state.
+  #
+  # Do some stuff on changed queries after
+  # Smartcard::PCSC::Context#wait_for_status_change.
+  #
+  #==== Examples
+  # 
+  # queries.with_changes.each do |q|
+  #   puts "changed: #{q.reader_name}"
+  # end
+  #
+  def with_changes
+    @queries.select { |query| query.changed? }
   end
   
   # Called by FFI::AutoPointer to release the reader states array.
@@ -100,6 +122,11 @@ class FFILib::ReaderStateQuery
   # containing such symbols.
   def event_state=(new_state)
     self[:event_state] = FFILib::ReaderStateQuery.pack_state new_state
+  end
+
+  # Short cut to identify a query with changed event_state.
+  def changed?
+    self.event_state.include? :changed
   end
   
   # The ATR of the smart-card in the query's reader.
