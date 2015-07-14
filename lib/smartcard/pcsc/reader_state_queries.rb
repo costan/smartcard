@@ -8,7 +8,7 @@ require 'set'
 
 # :nodoc: namespace
 module Smartcard::PCSC
- 
+
 
 # A continuous array of reader state queries.
 class ReaderStateQueries
@@ -17,7 +17,7 @@ class ReaderStateQueries
   # Creates an array of reader state queries.
   #
   # The states are unusable until they are assigned reader names by calling
-  # set_reader_name_of.  
+  # set_reader_name_of.
   def initialize(num_states)
     @_buffer = FFI::MemoryPointer.new :char,
                                       FFILib::ReaderStateQuery.size * num_states
@@ -37,12 +37,12 @@ class ReaderStateQueries
   def each(&block)
     @queries.each &block
   end
-  
+
   # The number of queries in the array.
   def length
     @queries.length
   end
-  
+
   # Updates all the queries to acknowledge status changes.
   #
   # This is a convenience method intended to be called after
@@ -51,13 +51,13 @@ class ReaderStateQueries
     @queries.each { |query| query[:current_state] = query[:event_state] }
   end
 
-  # Short cut: Select queries with 'changed' event state.
+  # Convenience method that selects queries that indicate reader state changes.
   #
-  # Do some stuff on changed queries after
+  # Use this method to perform actions on the relevant readers after calling
   # Smartcard::PCSC::Context#wait_for_status_change.
   #
   #==== Examples
-  # 
+  #
   # queries.with_changes.each do |q|
   #   puts "changed: #{q.reader_name}"
   # end
@@ -65,7 +65,7 @@ class ReaderStateQueries
   def with_changes
     @queries.select { |query| query.changed? }
   end
-  
+
   # Called by FFI::AutoPointer to release the reader states array.
   #
   # This should not be called by client code.
@@ -91,7 +91,7 @@ class FFILib::ReaderStateQuery
   def current_state
     FFILib::ReaderStateQuery.unpack_state self[:current_state]
   end
-  
+
   # Changes the query's current state.
   #
   # Smartcard::PCSC::Context#wait_for_status_change blocks while the reader
@@ -100,9 +100,9 @@ class FFILib::ReaderStateQuery
   # The new value can be a symbol in FFILib::CardState, or an Enumerable
   # containing such symbols.
   def current_state=(new_state)
-    self[:current_state] = FFILib::ReaderStateQuery.pack_state new_state    
+    self[:current_state] = FFILib::ReaderStateQuery.pack_state new_state
   end
-    
+
   # The query's event state.
   #
   # Smartcard::PCSC::Context#wait_for_status_change updates this value before it
@@ -124,21 +124,21 @@ class FFILib::ReaderStateQuery
     self[:event_state] = FFILib::ReaderStateQuery.pack_state new_state
   end
 
-  # Short cut to identify a query with changed event_state.
+  # Returns true if this query indicates that the reader's state has changed.
   def changed?
     self.event_state.include? :changed
   end
-  
+
   # The ATR of the smart-card in the query's reader.
   #
   # Smartcard::PCSC::Context#wait_for_status_change updates this value before it
   # returns.
   #
   # The value is a string containing the ATR bytes.
-  def atr    
+  def atr
     self[:atr].to_ptr.get_bytes 0, self[:atr_length]
   end
-  
+
   # Changes the smart-card ATR stored in the query.
   #
   # Smartcard::PCSC::Context#wait_for_status_change updates this value before it
@@ -149,7 +149,7 @@ class FFILib::ReaderStateQuery
     if new_atr.length > max_length = FFILib::Consts::MAX_ATR_SIZE
       raise ArgumentError, "ATR above maximum length of #{max_length}"
     end
-    
+
     self[:atr_length] = new_atr.length
     self[:atr].to_ptr.put_bytes 0, new_atr, 0, new_atr.length
   end
@@ -160,15 +160,15 @@ class FFILib::ReaderStateQuery
   def reader_name
     self[:reader_name].read_string
   end
-  
+
   # Changes the name of the reader referenceed by this query.
   #
   # Smartcard::PCSC::Context#wait_for_status_change never changes this value.
-  def reader_name=(new_name)    
+  def reader_name=(new_name)
     self[:reader_name].free if self[:reader_name].kind_of? FFI::MemoryPointer
     self[:reader_name] = FFI::MemoryPointer.from_string new_name
   end
-    
+
   # Packs an unpacked card state (symbol or set of symbols) into a number.
   #
   # This should not be used by client code.
